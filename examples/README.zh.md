@@ -265,7 +265,8 @@ A: 使用 EngineView 的 `onError` 回调和 `renderError` 自定义错误 UI。
 
 ## 相关资源
 
-- [Rill 文档](../../README.md)
-- [API 参考](../../docs/api/)
-- [最佳实践](../../docs/guides/best-practices.md)
-- [常见问题](../../docs/faq.md)
+- [Rill 文档](../README.zh.md)
+- [API 参考](../docs/API.zh.md)
+- [使用指南](../docs/GUIDE.zh.md)
+- [架构设计](../docs/ARCHITECTURE.zh.md)
+- [生产环境指南](../docs/PRODUCTION_GUIDE.zh.md)

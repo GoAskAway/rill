@@ -238,9 +238,11 @@ const data = devtools.exportAll();
 
 ## Documentation
 
-- [API Documentation](./docs/en/API.md) - Complete API reference
-- [User Guide](./docs/en/GUIDE.md) - Getting started tutorial and best practices
-- [Architecture Design](./docs/en/ARCHITECTURE.md) - System architecture details
+- [API Documentation](../../docs/API.md) - Complete API reference
+- [User Guide](../../docs/GUIDE.md) - Getting started tutorial and best practices
+- [Architecture Design](../../docs/ARCHITECTURE.md) - System architecture details
+- [Production Guide](../../docs/PRODUCTION_GUIDE.md) - Production deployment checklist
+- [Examples](../../examples/) - Working examples with complete source code
 
 ## Development
 
