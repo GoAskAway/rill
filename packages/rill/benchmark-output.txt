@@ -158,24 +158,40 @@ stdout | src/__benchmarks__/operations.bench.ts > O[3Jc
  PASS  Waiting for file changes...
        press h to show help, press q to quit
        rerun x11
-[2K[1A[2K[Gbenchmarks__/operations.bench.ts > Operations Benchmarks > ThrottledScheduler > benchmark: Enqueue single operation
+[2K[1A[2K[G[3Jc
+ RERUN  src/runtime/engine.ts x12
 
-================================================================================
-OPERATIONS BENCHMARK RESULTS
-================================================================================
 
-OperationMerger.merge (10 UPDATEs):
-  Mean: 0.002ms
-  Median: 0.001ms
-  Min: 0.001ms
-  Max: 0.019ms
-  Ops/sec: 657231
 
-OperationMerger.merge (100 UPDATEs):
-  Mean: 0.105ms
-  Median: 0.100ms
-  Min: 0.096ms
-  Max: 0.270ms
+ BENCH  Summary
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+       rerun x12
+[2K[1A[2K[G[3Jc
+ RERUN  src/runtime/engine.ts x13
+
+
+
+ BENCH  Summary
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+       rerun x13
+[2K[1A[2K[G[3Jc
+ RERUN  src/runtime/engine.ts x14
+
+
+
+ BENCH  Summary
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+       rerun x14
+[2K[1A[2K[G.270ms
   Ops/sec: 9531
 
 OperationMerger.merge (1000 mixed):
