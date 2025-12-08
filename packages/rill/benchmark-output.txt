@@ -125,36 +125,40 @@ stdout | src/__benchmarks__/operations.bench.ts > O[3Jc
  PASS  Waiting for file changes...
        press h to show help, press q to quit
        rerun x8
-[2K[1A[2K[Gedian: 0.001ms
-  Min: 0.001ms
-  Max: 0.019ms
-  Ops/sec: 657231
-
-OperationMerger.merge (100 UPDATEs):
-  Mean: 0.105ms
-  Median: 0.100ms
-  Min: 0.096ms
-  Max: 0.270ms
-  Ops/sec: 9531
-
-OperationMerger.merge (1000 mixed):
-  Mean: 0.035ms
-  Median: 0.032ms
-  Min: 0.024ms
-  Max: 0.230ms
-  Ops/sec: 28450
-
-OperationMerger.merge (no merging possible):
-  Mean: 0.004ms
-  Median: 0.004ms
-  Min: 0.003ms
-  Max: 0.096ms
-  Ops/sec: 264206
-
-================================================================================
+[2K[1A[2K[G[3Jc
+ RERUN  src/reconciler/index.ts x9
 
 
-stdout | src/__benchmarks__/operations.bench.ts > Operations Benchmarks > ThrottledScheduler > benchmark: Enqueue single operation
+
+ BENCH  Summary
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+       rerun x9
+[2K[1A[2K[G[3Jc
+ RERUN  src/reconciler/index.ts x10
+
+
+
+ BENCH  Summary
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+       rerun x10
+[2K[1A[2K[G[3Jc
+ RERUN  src/reconciler/index.ts x11
+
+
+
+ BENCH  Summary
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+       rerun x11
+[2K[1A[2K[Gbenchmarks__/operations.bench.ts > Operations Benchmarks > ThrottledScheduler > benchmark: Enqueue single operation
 
 ================================================================================
 OPERATIONS BENCHMARK RESULTS
