@@ -92,23 +92,40 @@ stdout | src/__benchmarks__/operations.bench.ts > O[3Jc
  PASS  Waiting for file changes...
        press h to show help, press q to quit
        rerun x8
-[2K[1A[2K[G 0.032ms
-  Min: 0.024ms
-  Max: 0.230ms
-  Ops/sec: 28450
-
-================================================================================
+[2K[1A[2K[G[3Jc
+ RERUN  src/reconciler/index.ts x6
 
 
-stdout | src/__benchmarks__/operations.bench.ts > Operations Benchmarks > OperationMerger > benchmark: No merging (all different IDs)
 
-================================================================================
-OPERATIONS BENCHMARK RESULTS
-================================================================================
+ BENCH  Summary
 
-OperationMerger.merge (10 UPDATEs):
-  Mean: 0.002ms
-  Median: 0.001ms
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+       rerun x6
+[2K[1A[2K[G[3Jc
+ RERUN  src/reconciler/index.ts x7
+
+
+
+ BENCH  Summary
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+       rerun x7
+[2K[1A[2K[G[3Jc
+ RERUN  src/reconciler/index.ts x8
+
+
+
+ BENCH  Summary
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+       rerun x8
+[2K[1A[2K[Gedian: 0.001ms
   Min: 0.001ms
   Max: 0.019ms
   Ops/sec: 657231
