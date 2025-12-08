@@ -1,0 +1,20 @@
+{
+  "name": "host-integration-example",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Complete host-side integration example using EngineView",
+  "scripts": {
+    "build": "rill build src/plugin.tsx -o dist/plugin.js",
+    "build:dev": "rill build src/plugin.tsx -o dist/plugin.js --no-minify --sourcemap"
+  },
+  "dependencies": {
+    "rill": "workspace:*",
+    "react": "^18.2.0",
+    "react-native": "^0.72.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "typescript": "^5.3.0",
+    "rill-cli": "workspace:*"
+  }
+}

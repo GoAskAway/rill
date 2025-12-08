@@ -1,41 +1,65 @@
 # Rill
 
-Lightweight, headless, sandboxed React Native dynamic UI rendering engine. (Chinese README migrated to README.zh.md under docs as per new policy)
+Lightweight, headless, sandboxed React Native dynamic UI rendering engine.
 
-> **rill** /rɪl/ n. 小溪、细流 - 寓意轻量、流畅的数据流动
+> **rill** /rɪl/ n. a small stream - symbolizing lightweight, smooth data flow
 
-## 特性 (This file will be deprecated; please refer to docs/en/*.zh.md)
+## Features
 
-- **类 React 开发体验**：使用 JSX 和 Hooks 编写插件
-- **完全沙箱隔离**：基于 QuickJS，插件崩溃不影响宿主
-- **轻量高效**：无 WebView 开销，原生渲染性能
-- **灵活扩展**：支持注册自定义业务组件
+- **React-like Development Experience**: Write plugins using JSX and Hooks
+- **Complete Sandbox Isolation**: Based on QuickJS, plugin crashes don't affect the host
+- **Lightweight and Efficient**: No WebView overhead, native rendering performance
+- **Flexible Extension**: Supports registering custom business components
 
-## 快速开始
+## Quick Start
 
-### 安装
+### Installation
+
+Compatibility and peer dependencies
+
+- Keep React and react-reconciler in compatible pairs to avoid install/runtime issues.
+- Choose only one platform peer: react-dom (Web) or react-native (RN). react-native-quickjs is optional for RN.
+
+Recommended pairings
+
+- React 18.2.x ↔ react-reconciler 0.29–0.31
+- React 19.0.x ↔ react-reconciler 0.32.x
+- React 19.2.x+ ↔ react-reconciler 0.33.x
+
+Install examples
+
+- React Native (RN 0.82 + React 19.2)
+  - npm i rill react@^19.2.1 react-native@^0.82 react-reconciler@^0.33
+- Web (React 19.2)
+  - npm i rill react@^19.2.1 react-dom@^19.2.1 react-reconciler@^0.33
+
+Notes
+
+- If you see npm ERESOLVE complaining react-reconciler@0.33 requires react@^19.2: upgrade React to ^19.2.1 (or align reconciler to 0.32 if you must stay on React 19.0).
+- Avoid using --legacy-peer-deps in the long term; fix the pairing instead.
+
 
 ```bash
 npm install rill
-# 或
+# or
 yarn add rill
 ```
 
-### 宿主端集成
+### Host Integration
 
 ```tsx
 import { Engine, EngineView } from 'rill';
 import { NativeStepList } from './components/NativeStepList';
 
-// 1. 创建引擎实例
+// 1. Create engine instance
 const engine = new Engine();
 
-// 2. 注册自定义组件
+// 2. Register custom components
 engine.register({
   StepList: NativeStepList,
 });
 
-// 3. 渲染插件
+// 3. Render plugin
 function App() {
   return (
     <EngineView
@@ -49,7 +73,7 @@ function App() {
 }
 ```
 
-### 插件端开发
+### Plugin Development
 
 ```tsx
 import { View, Text, TouchableOpacity, useHostEvent, useConfig } from 'rill/sdk';
@@ -73,24 +97,24 @@ export default function MyPlugin() {
 }
 ```
 
-### 构建插件
+### Build Plugin
 
 ```bash
-# 安装 CLI
+# Install CLI
 npm install -g rill
 
-# 构建
+# Build
 rill build src/plugin.tsx -o dist/bundle.js
 
-# 开发模式
+# Development mode
 rill build src/plugin.tsx --watch --no-minify --sourcemap
 ```
 
-## 架构
+## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                       宿主 App (React Native)                    │
+│                       Host App (React Native)                    │
 ├─────────────────────────────────────────────────────────────────┤
 │  EngineView → Engine → QuickJS Context                          │
 │                            │                                     │
@@ -104,17 +128,17 @@ rill build src/plugin.tsx --watch --no-minify --sourcemap
 │                    Reconciler (JSON Ops)                        │
 │                            │                                     │
 │                            ▼                                     │
-│                    Receiver → Registry → 原生组件树              │
+│                    Receiver → Registry → Native Component Tree  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-## 模块说明
+## Module Description
 
-| 模块 | 路径 | 说明 |
-|------|------|------|
-| SDK | `rill/sdk` | 插件开发套件，虚组件和 Hooks |
-| Runtime | `rill` | 宿主运行时，Engine 和 EngineView |
-| CLI | `rill` (bin) | 插件打包工具 |
+| Module | Path | Description |
+|--------|------|-------------|
+| SDK | `rill/sdk` | Plugin development kit, virtual components and Hooks |
+| Runtime | `rill` | Host runtime, Engine and EngineView |
+| CLI | `rill` (bin) | Plugin bundler tool |
 
 ## API
 
@@ -124,54 +148,54 @@ rill build src/plugin.tsx --watch --no-minify --sourcemap
 const engine = new Engine(options?: EngineOptions);
 
 interface EngineOptions {
-  timeout?: number;      // 执行超时 (默认 5000ms)
-  debug?: boolean;       // 调试模式
-  logger?: Logger;       // 自定义日志
+  timeout?: number;      // Execution timeout (default 5000ms)
+  debug?: boolean;       // Debug mode
+  logger?: Logger;       // Custom logger
 }
 
-// 注册组件
+// Register components
 engine.register({ ComponentName: ReactComponent });
 
-// 加载插件
+// Load plugin
 await engine.loadBundle(bundleUrl, initialProps);
 
-// 发送事件到插件
+// Send event to plugin
 engine.sendEvent('EVENT_NAME', payload);
 
-// 更新配置
+// Update configuration
 engine.updateConfig({ key: value });
 
-// 销毁
+// Destroy
 engine.destroy();
 ```
 
 ### SDK Hooks
 
 ```typescript
-// 订阅宿主事件
+// Subscribe to host events
 useHostEvent('EVENT_NAME', (payload) => {
-  // 处理事件
+  // Handle event
 });
 
-// 获取初始配置
+// Get initial configuration
 const config = useConfig<ConfigType>();
 
-// 发送消息到宿主
+// Send message to host
 const send = useSendToHost();
 send('EVENT_NAME', payload);
 ```
 
-### 默认组件
+### Default Components
 
-- `View` - 容器组件
-- `Text` - 文本组件
-- `Image` - 图片组件
-- `ScrollView` - 滚动容器
-- `TouchableOpacity` - 可触摸组件
+- `View` - Container component
+- `Text` - Text component
+- `Image` - Image component
+- `ScrollView` - Scroll container
+- `TouchableOpacity` - Touchable component
 
-## 性能优化
+## Performance Optimization
 
-Rill 内置多种性能优化机制：
+Rill has built-in performance optimization mechanisms:
 
 ```tsx
 import {
@@ -180,24 +204,24 @@ import {
   PerformanceMonitor
 } from 'rill/runtime';
 
-// 批量更新节流
+// Batch update throttling
 const scheduler = new ThrottledScheduler(onBatch, {
   maxBatchSize: 100,
   throttleMs: 16,
   enableMerge: true,
 });
 
-// 虚拟滚动
+// Virtual scrolling
 const calculator = new VirtualScrollCalculator({
   estimatedItemHeight: 60,
   overscan: 5,
 });
 
-// 性能监控
+// Performance monitoring
 const monitor = new PerformanceMonitor();
 ```
 
-## 调试工具
+## Debugging Tools
 
 ```tsx
 import { createDevTools } from 'rill/devtools';
@@ -205,55 +229,55 @@ import { createDevTools } from 'rill/devtools';
 const devtools = createDevTools();
 devtools.enable();
 
-// 查看组件树
+// View component tree
 console.log(devtools.getComponentTreeText(nodeMap, rootChildren));
 
-// 导出调试数据
+// Export debug data
 const data = devtools.exportAll();
 ```
 
-## 文档 (Deprecated)
+## Documentation
 
-- [API 文档](./docs/en/API.zh.md) - 完整 API 参考
-- [使用指南](./docs/en/GUIDE.zh.md) - 入门教程和最佳实践
-- [架构设计](./docs/en/ARCHITECTURE.zh.md) - 系统架构详解
+- [API Documentation](./docs/en/API.md) - Complete API reference
+- [User Guide](./docs/en/GUIDE.md) - Getting started tutorial and best practices
+- [Architecture Design](./docs/en/ARCHITECTURE.md) - System architecture details
 
-## 开发
+## Development
 
 ```bash
-# 安装依赖
+# Install dependencies
 npm install
 
-# 构建
+# Build
 npm run build
 
-# 开发模式
+# Development mode
 npm run build:watch
 
-# 类型检查
+# Type check
 npm run typecheck
 
-# 测试
+# Test
 npm run test
 
-# 测试覆盖率
+# Test coverage
 npm run test:coverage
 ```
 
-## 测试
+## Testing
 
-项目包含完整的测试套件：
+The project includes a complete test suite:
 
-- 单元测试：各模块功能测试
-- 集成测试：端到端场景测试
-- 覆盖率目标：80%+ 代码覆盖
+- Unit tests: Module functionality tests
+- Integration tests: End-to-end scenario tests
+- Coverage target: 80%+ code coverage
 
 ```bash
-npm test           # 运行所有测试
-npm test -- --run  # 单次运行
-npm test:coverage  # 生成覆盖率报告
+npm test           # Run all tests
+npm test -- --run  # Single run
+npm test:coverage  # Generate coverage report
 ```
 
-## 许可证
+## License
 
 Apache-2.0

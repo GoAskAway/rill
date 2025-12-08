@@ -1,0 +1,302 @@
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+ RUN  v1.6.1 /Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill
+
+stdout | src/__benchmarks__/engine.bench.ts > Engine Benchmarks > benchmark: Engine initialization
+
+================================================================================
+ENGINE BENCHMARK RESULTS
+================================================================================
+
+Engine.new:
+  Mean: 0.001ms
+  Median: 0.001ms
+  Min: 0.001ms
+  Max: 0.017ms
+  Ops/sec: 805360
+
+================================================================================
+
+
+stdout | src/__benchmarks__/engine.bench.ts > Engine Benchmarks > benchmark: Simple plugin loading
+
+================================================================================
+ENGINE BENCHMARK RESULTS
+================================================================================
+
+Engine.new:
+  Mean: 0.001ms
+  Median: 0.001ms
+  Min: 0.001ms
+  Max: 0.017ms
+  Ops/sec: 805360
+
+================================================================================
+
+
+stdout | src/__benchmarks__/engine.bench.ts > Engine Benchmarks > benchmark: Medium plugin loading
+
+================================================================================
+ENGINE BENCHMARK RESULTS
+================================================================================
+
+Engine.new:
+  Mean: 0.001ms
+  Median: 0.001ms
+  Min: 0.001ms
+  Max: 0.017ms
+  Ops/sec: 805360
+
+================================================================================
+
+
+stdout | src/__benchmarks__/engine.bench.ts > Engine Benchmarks > benchmark: Large plugin loading
+
+================================================================================
+ENGINE BENCHMARK RESULTS
+================================================================================
+
+Engine.new:
+  Mean: 0.001ms
+  Median: 0.001ms
+  Min: 0.001ms
+  Max: 0.017ms
+  Ops/sec: 805360
+
+================================================================================
+
+
+stdout | src/__benchmarks__/engine.bench.ts > Engine Benchmarks > benchmark: Send event to sandbox
+
+================================================================================
+ENGINE BENCHMARK RESULTS
+================================================================================
+
+Engine.new:
+  Mean: 0.001ms
+  Median: 0.001ms
+  Min: 0.001ms
+  Max: 0.017ms
+  Ops/sec: 805360
+
+Engine.sendEvent:
+  Mean: 0.078ms
+  Median: 0.065ms
+  Min: 0.051ms
+  Max: 2.517ms
+  Ops/sec: 12862
+
+================================================================================
+
+
+stdout | src/__benchmarks__/engine.bench.ts > Engine Benchmarks > benchmark: Update config
+
+================================================================================
+ENGINE BENCHMARK RESULTS
+================================================================================
+
+Engine.new:
+  Mean: 0.001ms
+  Median: 0.001ms
+  Min: 0.001ms
+  Max: 0.017ms
+  Ops/sec: 805360
+
+Engine.sendEvent:
+  Mean: 0.078ms
+  Median: 0.065ms
+  Min: 0.051ms
+  Max: 2.517ms
+  Ops/sec: 12862
+
+Engine.updateConfig:
+  Mean: 0.001ms
+  Median: 0.001ms
+  Min: 0.001ms
+  Max: 0.018ms
+  Ops/sec: 930079
+
+================================================================================
+
+
+stdout | src/__benchmarks__/engine.bench.ts > Engine Benchmarks > benchmark: Create receiver
+
+================================================================================
+ENGINE BENCHMARK RESULTS
+================================================================================
+
+Engine.new:
+  Mean: 0.001ms
+  Median: 0.001ms
+  Min: 0.001ms
+  Max: 0.017ms
+  Ops/sec: 805360
+
+Engine.sendEvent:
+  Mean: 0.078ms
+  Median: 0.065ms
+  Min: 0.051ms
+  Max: 2.517ms
+  Ops/sec: 12862
+
+Engine.updateConfig:
+  Mean: 0.001ms
+  Median: 0.001ms
+  Min: 0.001ms
+  Max: 0.018ms
+  Ops/sec: 930079
+
+Engine.createReceiver:
+  Mean: 0.001ms
+  Median: 0.000ms
+  Min: 0.000ms
+  Max: 0.008ms
+  Ops/sec: 1617286
+
+================================================================================
+
+
+stdout | src/__benchmarks__/engine.bench.ts > Engine Benchmarks > memory: Engine initialization
+
+Memory Usage:
+  Before: 64.01 MB
+  After: 64.02 MB
+  Delta: 9.19 KB
+
+================================================================================
+ENGINE BENCHMARK RESULTS
+================================================================================
+
+Engine.new:
+  Mean: 0.001ms
+  Median: 0.001ms
+  Min: 0.001ms
+  Max: 0.017ms
+  Ops/sec: 805360
+
+Engine.sendEvent:
+  Mean: 0.078ms
+  Median: 0.065ms
+  Min: 0.051ms
+  Max: 2.517ms
+  Ops/sec: 12862
+
+Engine.updateConfig:
+  Mean: 0.001ms
+  Median: 0.001ms
+  Min: 0.001ms
+  Max: 0.018ms
+  Ops/sec: 930079
+
+Engine.createReceiver:
+  Mean: 0.001ms
+  Median: 0.000ms
+  Min: 0.000ms
+  Max: 0.008ms
+  Ops/sec: 1617286
+
+================================================================================
+
+
+stdout | src/__benchmarks__/engine.bench.ts > Engine Benchmarks > memory: Plugin loading
+
+Memory Usage:
+  Before: 64.30 MB
+  After: 64.12 MB
+  Delta: NaN undefined
+
+================================================================================
+ENGINE BENCHMARK RESULTS
+================================================================================
+
+Engine.new:
+  Mean: 0.001ms
+  Median: 0.001ms
+  Min: 0.001ms
+  Max: 0.017ms
+  Ops/sec: 805360
+
+Engine.sendEvent:
+  Mean: 0.078ms
+  Median: 0.065ms
+  Min: 0.051ms
+  Max: 2.517ms
+  Ops/sec: 12862
+
+Engine.updateConfig:
+  Mean: 0.001ms
+  Median: 0.001ms
+  Min: 0.001ms
+  Max: 0.018ms
+  Ops/sec: 930079
+
+Engine.createReceiver:
+  Mean: 0.001ms
+  Median: 0.000ms
+  Min: 0.000ms
+  Max: 0.008ms
+  Ops/sec: 1617286
+
+================================================================================
+
+
+ ❯ src/__benchmarks__/engine.bench.ts  (9 tests | 3 failed) 87ms
+   ❯ src/__benchmarks__/engine.bench.ts > Engine Benchmarks > benchmark: Simple plugin loading
+     → [rill] Engine already loaded a bundle
+   ❯ src/__benchmarks__/engine.bench.ts > Engine Benchmarks > benchmark: Medium plugin loading
+     → [rill] Engine already loaded a bundle
+   ❯ src/__benchmarks__/engine.bench.ts > Engine Benchmarks > benchmark: Large plugin loading
+     → [rill] Engine already loaded a bundle
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__benchmarks__/engine.bench.ts > Engine Benchmarks > benchmark: Simple plugin loading
+Error: [rill] Engine already loaded a bundle
+ ❯ Engine.loadBundle src/runtime/engine.ts:198:13
+    196| 
+    197|     if (this.loaded) {
+    198|       throw new Error('[rill] Engine already loaded a bundle');
+       |             ^
+    199|     }
+    200| 
+ ❯ benchmark.iterations src/__benchmarks__/engine.bench.ts:142:22
+ ❯ Module.benchmark src/__benchmarks__/utils/benchmark.ts:52:11
+ ❯ src/__benchmarks__/engine.bench.ts:139:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/__benchmarks__/engine.bench.ts > Engine Benchmarks > benchmark: Medium plugin loading
+Error: [rill] Engine already loaded a bundle
+ ❯ Engine.loadBundle src/runtime/engine.ts:198:13
+    196| 
+    197|     if (this.loaded) {
+    198|       throw new Error('[rill] Engine already loaded a bundle');
+       |             ^
+    199|     }
+    200| 
+ ❯ benchmark.iterations src/__benchmarks__/engine.bench.ts:153:22
+ ❯ Module.benchmark src/__benchmarks__/utils/benchmark.ts:52:11
+ ❯ src/__benchmarks__/engine.bench.ts:150:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/__benchmarks__/engine.bench.ts > Engine Benchmarks > benchmark: Large plugin loading
+Error: [rill] Engine already loaded a bundle
+ ❯ Engine.loadBundle src/runtime/engine.ts:198:13
+    196| 
+    197|     if (this.loaded) {
+    198|       throw new Error('[rill] Engine already loaded a bundle');
+       |             ^
+    199|     }
+    200| 
+ ❯ benchmark.iterations src/__benchmarks__/engine.bench.ts:164:22
+ ❯ Module.benchmark src/__benchmarks__/utils/benchmark.ts:52:11
+ ❯ src/__benchmarks__/engine.bench.ts:161:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 6 passed (9)
+   Start at  23:40:30
+   Duration  417ms (transform 52ms, setup 0ms, collect 74ms, tests 87ms, environment 0ms, prepare 65ms)
+
