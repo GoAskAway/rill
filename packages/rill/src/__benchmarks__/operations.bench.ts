@@ -216,12 +216,12 @@ describe('Operations Benchmarks', () => {
     });
 
     it('benchmark: Record single batch', async () => {
-      const batch = {
+      const batch: OperationBatch = {
         version: 1,
         batchId: 1,
         operations: [
-          { op: 'CREATE' as const, id: 1, type: 'View', props: {} },
-          { op: 'UPDATE' as const, id: 1, props: { style: {} } },
+          { op: 'CREATE', id: 1, type: 'View', props: {} },
+          { op: 'UPDATE', id: 1, props: { style: {} } },
         ],
       };
 

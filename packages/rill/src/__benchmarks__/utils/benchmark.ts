@@ -72,9 +72,9 @@ export async function benchmark(
   // Calculate statistics
   const sorted = [...samples].sort((a, b) => a - b);
   const mean = samples.reduce((a, b) => a + b, 0) / samples.length;
-  const median = sorted[Math.floor(sorted.length / 2)];
-  const min = sorted[0];
-  const max = sorted[sorted.length - 1];
+  const median = sorted[Math.floor(sorted.length / 2)] ?? 0;
+  const min = sorted[0] ?? 0;
+  const max = sorted[sorted.length - 1] ?? 0;
 
   // Calculate standard deviation
   const variance =
