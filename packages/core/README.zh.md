@@ -29,12 +29,23 @@
 
 安装示例
 
-```bash
-# React Native (RN 0.82 + React 19.2)
-bun add rill react@^19.2.1 react-native@^0.82 react-reconciler@^0.33
+在 monorepo 中，通过 package.json 添加依赖：
 
-# Web (React 19.2)
-bun add rill react@^19.2.1 react-dom@^19.2.1 react-reconciler@^0.33
+```json
+{
+  "dependencies": {
+    "@rill/core": "workspace:*",
+    "react": "^19.2.1",
+    "react-native": "^0.82",
+    "react-reconciler": "^0.33"
+  }
+}
+```
+
+或从 GitHub 安装：
+
+```bash
+bun add github:kookyleo/rill#packages/core
 ```
 
 ### 宿主端集成
@@ -92,14 +103,14 @@ export default function MyBundle() {
 ### 构建 Bundle
 
 ```bash
-# 安装 CLI
-bun add -g @anthropic/rill-cli
+# 使用 workspace 中的 CLI
+bun run --filter @rill/cli build src/bundle.tsx -o dist/bundle.js
 
-# 构建
-rill build src/bundle.tsx -o dist/bundle.js
+# 或者直接运行 CLI 脚本
+bun packages/cli/src/index.ts build src/bundle.tsx -o dist/bundle.js
 
 # 开发模式
-rill build src/bundle.tsx --watch --no-minify --sourcemap
+bun packages/cli/src/index.ts build src/bundle.tsx --watch --no-minify --sourcemap
 ```
 
 ## 架构
@@ -135,7 +146,7 @@ rill build src/bundle.tsx --watch --no-minify --sourcemap
 │                                                                   │
 │  ┌────────────────────────────────────────────┐                 │
 │  │  Engine (runtime/engine.ts)                │                 │
-│  │  ├─ 创建沙箱 (QuickJS/Worker/VM)           │                 │
+│  │  ├─ 创建沙箱 (vm/worker/none)              │                 │
 │  │  ├─ 注入 reconciler 到沙箱                 │                 │
 │  │  └─ 接收来自 Guest 的操作                  │                 │
 │  └────────────────┬───────────────────────────┘                 │
@@ -154,7 +165,6 @@ rill build src/bundle.tsx --watch --no-minify --sourcemap
 │  │  Guest 代码    │ │                 │                        │
 │  │  (用户的 React Bundle)             │                        │
 │  │                ↓ │                 │                        │
-│  │  import { render } from 'rill/reconciler';                  │
 │  │  import { View, Text } from '@rill/core/sdk';                     │
 │  │                  │                 │                        │
 │  │  <View>          │                 │                        │
@@ -213,9 +223,9 @@ const engine = new PooledEngine({ pool });
 
 | 模块 | 路径 | 说明 |
 |------|------|------|
-| SDK | `rill/sdk` | Guest 开发套件，虚组件和 Hooks |
-| Runtime | `rill` | 宿主运行时，Engine/PooledEngine 和 EngineView |
-| CLI | `@anthropic/rill-cli` | Bundle 打包工具 |
+| SDK | `@rill/core/sdk` | Guest 开发套件，虚组件和 Hooks |
+| Runtime | `@rill/core` | 宿主运行时，Engine/PooledEngine 和 EngineView |
+| CLI | `@rill/cli` | Bundle 打包工具 (Vite-based) |
 
 ## API
 
@@ -287,7 +297,7 @@ import {
   ThrottledScheduler,
   VirtualScrollCalculator,
   PerformanceMonitor
-} from 'rill/runtime';
+} from '@rill/core';
 
 // 批量更新节流
 const scheduler = new ThrottledScheduler(onBatch, {
@@ -309,7 +319,7 @@ const monitor = new PerformanceMonitor();
 ## 调试工具
 
 ```tsx
-import { createDevTools } from 'rill/devtools';
+import { createDevTools } from '@rill/core/devtools';
 
 const devtools = createDevTools();
 devtools.enable();
