@@ -28,8 +28,8 @@ host-integration/
 ### 1. 构建guest
 
 ```bash
-npm install
-npm run build
+bun install
+bun run build
 ```
 
 ### 2. 在宿主应用中使用

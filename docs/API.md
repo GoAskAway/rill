@@ -629,26 +629,26 @@ Command-line tool for building guests.
 
 ```bash
 # Build guest
-npx rill build src/guest.tsx -o dist/bundle.js
+bunx rill build src/guest.tsx -o dist/bundle.js
 
 # Watch mode
-npx rill build src/guest.tsx -o dist/bundle.js --watch
+bunx rill build src/guest.tsx -o dist/bundle.js --watch
 
 # Generate sourcemap
-npx rill build src/guest.tsx -o dist/bundle.js --sourcemap
+bunx rill build src/guest.tsx -o dist/bundle.js --sourcemap
 
 # No minification
-npx rill build src/guest.tsx -o dist/bundle.js --no-minify
+bunx rill build src/guest.tsx -o dist/bundle.js --no-minify
 
 # Generate metafile
-npx rill build src/guest.tsx -o dist/bundle.js --metafile dist/meta.json
+bunx rill build src/guest.tsx -o dist/bundle.js --metafile dist/meta.json
 ```
 
 ### Analyze Command
 
 ```bash
 # Analyze bundle
-npx rill analyze dist/bundle.js
+bunx rill analyze dist/bundle.js
 ```
 
 ### Programmatic Interface

@@ -68,16 +68,16 @@
 cd examples/simple-guest  # 或 host-integration, advanced-features
 
 # 安装依赖
-npm install
+bun install
 
 # 构建guest
-npm run build
+bun run build
 
 # 开发模式 (不压缩 + sourcemap)
-npm run build:dev
+bun run build:dev
 
 # 监听文件变化 (如果支持)
-npm run watch
+bun run watch
 ```
 
 构建输出: `dist/bundle.js` 或 `dist/guest.js`
@@ -149,7 +149,7 @@ host-integration/
 1. 复制 `simple-guest` 目录
 2. 修改 `package.json` 中的名称
 3. 编辑 `src/index.tsx` 实现guest逻辑
-4. 运行 `npm run build` 构建
+4. 运行 `bun run build` 构建
 
 ## SDK 导入
 
@@ -283,7 +283,7 @@ A: 需要在宿主端通过 `requireWhitelist` 配置允许的模块列表。参
 ### Q: 如何调试guest?
 
 A:
-1. 使用 `npm run build:dev` 构建带 sourcemap 的版本
+1. 使用 `bun run build:dev` 构建带 sourcemap 的版本
 2. 在 Engine 配置中启用 `debug: true`
 3. 使用 console.log 输出日志 (宿主端可见)
 

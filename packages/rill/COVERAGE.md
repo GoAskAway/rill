@@ -25,10 +25,10 @@ These thresholds are defined in `scripts/check-coverage.cjs` and checked in CI.
 
 ```bash
 # Run tests with coverage report
-npm run test:coverage
+bun run test:coverage
 
 # Run tests and check against thresholds
-npm run test:coverage:check
+bun run test:coverage:check
 ```
 
 ## CI Integration

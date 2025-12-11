@@ -321,8 +321,8 @@ setInterval(() => {
 ## Running the Example
 
 ```bash
-npm install
-npm run build
+bun install
+bun run build
 ```
 
 Then refer to the integration example in `src/host-demo.tsx`.

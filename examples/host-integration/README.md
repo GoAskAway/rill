@@ -28,8 +28,8 @@ host-integration/
 ### 1. Build the Guest
 
 ```bash
-npm install
-npm run build
+bun install
+bun run build
 ```
 
 ### 2. Use in Host Application
