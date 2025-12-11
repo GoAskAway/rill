@@ -1,5 +1,5 @@
 {
-  "name": "rill",
+  "name": "@rill/core",
   "version": "0.1.0",
   "type": "module",
   "description": "A lightweight, headless, sandboxed dynamic UI rendering engine for React Native",

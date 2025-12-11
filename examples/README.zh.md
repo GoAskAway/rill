@@ -173,7 +173,7 @@ import {
   StyleProp,
   LayoutEvent,
   ScrollEvent,
-} from 'rill/sdk';
+} from '@rill/core/sdk';
 ```
 
 ## 学习路径
@@ -219,7 +219,7 @@ import {
   useHostEvent,      // 监听宿主事件
   useSendToHost,     // 发送消息到宿主
   useConfig,         // 获取guest配置
-} from 'rill/sdk';
+} from '@rill/core/sdk';
 
 // 发送消息到宿主
 const sendToHost = useSendToHost();
@@ -243,7 +243,7 @@ console.log('Title:', config.title);
 ### 宿主端 API
 
 ```tsx
-import { Engine, EngineView } from 'rill';
+import { Engine, EngineView } from '@rill/core';
 
 // 创建 Engine
 const engine = new Engine({

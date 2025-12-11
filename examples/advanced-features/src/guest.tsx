@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
-} from 'rill/sdk';
+} from '@rill/core/sdk';
 
 export default function Guest() {
   const [workload, setWorkload] = useState<'light' | 'heavy' | 'infinite'>('light');

@@ -40,7 +40,7 @@ bun add rill react@^19.2.1 react-dom@^19.2.1 react-reconciler@^0.33
 ### Host Integration
 
 ```tsx
-import { Engine, EngineView } from 'rill';
+import { Engine, EngineView } from '@rill/core';
 import { NativeStepList } from './components/NativeStepList';
 
 // 1. Create engine instance
@@ -68,7 +68,7 @@ function App() {
 ### Guest Bundle Development
 
 ```tsx
-import { View, Text, TouchableOpacity, useHostEvent, useConfig } from 'rill/sdk';
+import { View, Text, TouchableOpacity, useHostEvent, useConfig } from '@rill/core/sdk';
 
 export default function MyBundle() {
   const config = useConfig<{ theme: string }>();
@@ -155,7 +155,7 @@ rill build src/bundle.tsx --watch --no-minify --sourcemap
 │  │  (User's React Bundle)             │                        │
 │  │                ↓ │                 │                        │
 │  │  import { render } from 'rill/reconciler';                  │
-│  │  import { View, Text } from 'rill/sdk';                     │
+│  │  import { View, Text } from '@rill/core/sdk';                     │
 │  │                  │                 │                        │
 │  │  <View>          │                 │                        │
 │  │    <Text>Hello</Text>              │                        │
@@ -199,7 +199,7 @@ const engine = new Engine({ sandbox: 'vm' });
 Multiple engines share a worker pool - suitable for multi-tenant scenarios with resource limits and fault isolation.
 
 ```typescript
-import { PooledEngine, createWorkerPool } from 'rill';
+import { PooledEngine, createWorkerPool } from '@rill/core';
 
 // Simple usage - uses global pool
 const engine = new PooledEngine();
@@ -222,7 +222,7 @@ const engine = new PooledEngine({ pool });
 ### Engine
 
 ```typescript
-import { Engine, PooledEngine } from 'rill';
+import { Engine, PooledEngine } from '@rill/core';
 
 // Standalone engine
 const engine = new Engine(options?: EngineOptions);

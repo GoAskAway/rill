@@ -25,7 +25,7 @@ SDK used by guest developers, runs in the QuickJS sandbox.
 Virtual components are string identifiers that are transformed into operation instructions during bundling.
 
 ```tsx
-import { View, Text, Image, ScrollView, TouchableOpacity, TextInput, FlatList, Button, Switch, ActivityIndicator } from 'rill/sdk';
+import { View, Text, Image, ScrollView, TouchableOpacity, TextInput, FlatList, Button, Switch, ActivityIndicator } from '@rill/core/sdk';
 ```
 
 #### View
@@ -225,7 +225,7 @@ Loading indicator.
 Listen to host events.
 
 ```tsx
-import { useHostEvent } from 'rill/sdk';
+import { useHostEvent } from '@rill/core/sdk';
 
 function Guest() {
   useHostEvent<{ force: boolean }>('REFRESH', (payload) => {
@@ -246,7 +246,7 @@ function Guest() {
 Get initial configuration.
 
 ```tsx
-import { useConfig } from 'rill/sdk';
+import { useConfig } from '@rill/core/sdk';
 
 interface Config {
   theme: 'light' | 'dark';
@@ -269,7 +269,7 @@ function Guest() {
 Send events to host.
 
 ```tsx
-import { useSendToHost } from 'rill/sdk';
+import { useSendToHost } from '@rill/core/sdk';
 
 function Guest() {
   const sendToHost = useSendToHost();

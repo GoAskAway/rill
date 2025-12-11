@@ -40,7 +40,7 @@ bun add rill react@^19.2.1 react-dom@^19.2.1 react-reconciler@^0.33
 ### 宿主端集成
 
 ```tsx
-import { Engine, EngineView } from 'rill';
+import { Engine, EngineView } from '@rill/core';
 import { NativeStepList } from './components/NativeStepList';
 
 // 1. 创建引擎实例
@@ -68,7 +68,7 @@ function App() {
 ### Guest Bundle 开发
 
 ```tsx
-import { View, Text, TouchableOpacity, useHostEvent, useConfig } from 'rill/sdk';
+import { View, Text, TouchableOpacity, useHostEvent, useConfig } from '@rill/core/sdk';
 
 export default function MyBundle() {
   const config = useConfig<{ theme: string }>();
@@ -155,7 +155,7 @@ rill build src/bundle.tsx --watch --no-minify --sourcemap
 │  │  (用户的 React Bundle)             │                        │
 │  │                ↓ │                 │                        │
 │  │  import { render } from 'rill/reconciler';                  │
-│  │  import { View, Text } from 'rill/sdk';                     │
+│  │  import { View, Text } from '@rill/core/sdk';                     │
 │  │                  │                 │                        │
 │  │  <View>          │                 │                        │
 │  │    <Text>你好</Text>               │                        │
@@ -199,7 +199,7 @@ const engine = new Engine({ sandbox: 'vm' });
 多个 Engine 共享 Worker 池 - 适用于多租户场景，具备资源限制和故障隔离能力。
 
 ```typescript
-import { PooledEngine, createWorkerPool } from 'rill';
+import { PooledEngine, createWorkerPool } from '@rill/core';
 
 // 简单用法 - 使用全局池
 const engine = new PooledEngine();
@@ -222,7 +222,7 @@ const engine = new PooledEngine({ pool });
 ### Engine
 
 ```typescript
-import { Engine, PooledEngine } from 'rill';
+import { Engine, PooledEngine } from '@rill/core';
 
 // 独立引擎
 const engine = new Engine(options?: EngineOptions);

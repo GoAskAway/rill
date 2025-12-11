@@ -12,7 +12,7 @@ import {
   useHostEvent,
   useSendToHost,
   useConfig,
-} from 'rill/sdk';
+} from '@rill/core/sdk';
 
 interface Config {
   userId?: string;

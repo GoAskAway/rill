@@ -37,7 +37,7 @@ bun run build
 参考 `src/HostApp.tsx` 中的集成示例:
 
 ```tsx
-import { Engine, EngineView } from 'rill';
+import { Engine, EngineView } from '@rill/core';
 import { createQuickJSProvider } from './QuickJSProvider';
 
 // 创建 Engine 实例
@@ -107,7 +107,7 @@ engine.sendEvent('THEME_CHANGE', { theme: 'dark' });
 
 ```tsx
 // 在guest代码中
-import { useSendToHost } from 'rill/sdk';
+import { useSendToHost } from '@rill/core/sdk';
 
 const sendToHost = useSendToHost();
 sendToHost('USER_ACTION', { action: 'click', target: 'button' });
@@ -174,7 +174,7 @@ engine.register({
 在guest中使用:
 
 ```tsx
-import { View } from 'rill/sdk';
+import { View } from '@rill/core/sdk';
 
 // 自动获取注册的组件
 function Guest() {

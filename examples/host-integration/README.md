@@ -37,7 +37,7 @@ bun run build
 Refer to the integration example in `src/HostApp.tsx`:
 
 ```tsx
-import { Engine, EngineView } from 'rill';
+import { Engine, EngineView } from '@rill/core';
 import { createQuickJSProvider } from './QuickJSProvider';
 
 // Create Engine instance
@@ -107,7 +107,7 @@ engine.sendEvent('THEME_CHANGE', { theme: 'dark' });
 
 ```tsx
 // In guest code
-import { useSendToHost } from 'rill/sdk';
+import { useSendToHost } from '@rill/core/sdk';
 
 const sendToHost = useSendToHost();
 sendToHost('USER_ACTION', { action: 'click', target: 'button' });
@@ -174,7 +174,7 @@ engine.register({
 Use in guest:
 
 ```tsx
-import { View } from 'rill/sdk';
+import { View } from '@rill/core/sdk';
 
 // Automatically get registered component
 function Guest() {
