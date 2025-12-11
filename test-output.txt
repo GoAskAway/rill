@@ -1,0 +1,380 @@
+bun test v1.3.4 (5eb2145b)
+
+packages/cli/src/build.analyze.integration.test.ts:
+No name was provided for external module "react/jsx-dev-runtime" in "output.globals" – guessing "jsxDevRuntime".
+
+../../../../../../../Users/leo/XData/Starbucks/GoAskAway/rill/packages/cli/src/build.test.ts:
+No name was provided for external module "react/jsx-dev-runtime" in "output.globals" – guessing "jsxDevRuntime".
+No name was provided for external module "react/jsx-dev-runtime" in "output.globals" – guessing "jsxDevRuntime".
+Bundle Analysis:
+  File: dist/bad-bundle.js
+  Size: 0.05 KB
+  Lines: 3
+  Report: dist/analyze.report.json
+
+../../../../../../../Users/leo/XData/Starbucks/GoAskAway/rill/packages/cli/src/build.analyze.edges.test.ts:
+Bundle Analysis:
+  File: dist/dyn.js
+  Size: 0.02 KB
+  Lines: 1
+  Report: dist/analyze.report.json
+Bundle Analysis:
+  File: dist/dyn-rel.js
+  Size: 0.02 KB
+  Lines: 1
+  Report: dist/analyze.report.json
+
+../../../../../../../Users/leo/XData/Starbucks/GoAskAway/rill/packages/cli/src/build.analyze.ignore.test.ts:
+Bundle Analysis:
+  File: dist/urls.js
+  Size: 0.09 KB
+  Lines: 1
+  Report: dist/analyze.report.json
+Bundle Analysis:
+  File: dist/importmeta.js
+  Size: 0.03 KB
+  Lines: 1
+  Report: dist/analyze.report.json
+Bundle Analysis:
+  File: dist/bundler.js
+  Size: 0.06 KB
+  Lines: 1
+  Report: dist/analyze.report.json
+
+../../../../../../../Users/leo/XData/Starbucks/GoAskAway/rill/packages/cli/src/build.analyze.moreedges.test.ts:
+Bundle Analysis:
+  File: dist/comment.js
+  Size: 0.07 KB
+  Lines: 3
+  Report: dist/analyze.report.json
+Bundle Analysis:
+  File: dist/strings.js
+  Size: 0.06 KB
+  Lines: 1
+  Report: dist/analyze.report.json
+Bundle Analysis:
+  File: dist/real-dyn.js
+  Size: 0.02 KB
+  Lines: 1
+  Report: dist/analyze.report.json
+
+../../../../../../../Users/leo/XData/Starbucks/GoAskAway/rill/packages/cli/src/analyze.command.test.ts:
+Bundle Analysis:
+  File: dist/cli-analyze.js
+  Size: 0.02 KB
+  Lines: 1
+  Report: dist/analyze.report.json
+
+../../../../../../../Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.worker.e2e.test.ts:
+[WorkerQuickJSProvider] setGlobal value is not JSON-serializable, ignoring console
+[rill] Failed to inject runtime helpers: warn: Use evalAsync with WorkerQuickJSProvider
+      at eval (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/WorkerQuickJSProvider.ts:53:19)
+      at injectRuntimeAPI (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.ts:503:20)
+      at initializeRuntime (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.ts:335:10)
+      at async loadBundle (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.ts:260:18)
+      at async <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.worker.e2e.test.ts:19:18)
+
+
+../../../../../../../Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.defaultprovider.e2e.test.ts:
+[WorkerQuickJSProvider] setGlobal value is not JSON-serializable, ignoring console
+[rill] Failed to inject runtime helpers: warn: Use evalAsync with WorkerQuickJSProvider
+      at eval (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/WorkerQuickJSProvider.ts:53:19)
+      at injectRuntimeAPI (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.ts:503:20)
+      at initializeRuntime (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.ts:335:10)
+      at async loadBundle (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.ts:260:18)
+      at async <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.defaultprovider.e2e.test.ts:11:18)
+
+[WorkerQuickJSProvider] setGlobal value is not JSON-serializable, ignoring console
+[rill] Failed to inject runtime helpers: warn: Use evalAsync with WorkerQuickJSProvider
+      at eval (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/WorkerQuickJSProvider.ts:53:19)
+      at injectRuntimeAPI (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.ts:503:20)
+      at initializeRuntime (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.ts:335:10)
+      at async loadBundle (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.ts:260:18)
+      at async <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.defaultprovider.e2e.test.ts:21:18)
+
+[WorkerQuickJSProvider] setGlobal value is not JSON-serializable, ignoring console
+[rill] Failed to inject runtime helpers: warn: Use evalAsync with WorkerQuickJSProvider
+      at eval (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/WorkerQuickJSProvider.ts:53:19)
+      at injectRuntimeAPI (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.ts:503:20)
+      at initializeRuntime (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.ts:335:10)
+      at async loadBundle (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.ts:260:18)
+      at async <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.defaultprovider.e2e.test.ts:30:20)
+
+(fail) DefaultQuickJSProvider (auto) - Node/Web > dead-loop should be interrupted by hard timeout [5001.02ms]
+  ^ this test timed out after 5000ms.
+
+../../../../../../../Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.worker.isolation.test.ts:
+[rill] Failed to inject runtime helpers: warn: Use evalAsync with WorkerQuickJSProvider
+      at eval (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/WorkerQuickJSProvider.ts:53:19)
+      at injectRuntimeAPI (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.ts:503:20)
+      at initializeRuntime (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.ts:335:10)
+      at async loadBundle (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.ts:260:18)
+      at async <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.worker.isolation.test.ts:35:18)
+
+
+../../../../../../../Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/EngineView.test.tsx:
+
+# Unhandled error between tests
+-------------------------------
+15239 |       suspendResource = shim,
+15240 |       NO_CONTEXT = {},
+15241 |       nodeToInstanceMap = new WeakMap();
+15242 |     Object.freeze(NO_CONTEXT);
+15243 |     var currentUpdatePriority = 0,
+15244 |       scheduleTimeout = setTimeout,
+                                ^
+ReferenceError: setTimeout is not defined
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/node_modules/react-test-renderer/cjs/react-test-renderer.development.js:15244:25)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/node_modules/react-test-renderer/cjs/react-test-renderer.development.js:17455:23)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/node_modules/react-test-renderer/index.js:6:10)
+-------------------------------
+
+
+../../../../../../../Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.worker.jsx.complex.e2e.test.ts:
+64 |         try {
+65 |           JSON.stringify(value);
+66 |           post({ type: 'setGlobal', name, value });
+67 |         } catch {
+68 |           // eslint-disable-next-line no-console
+69 |           console.warn('[WorkerQuickJSProvider] setGlobal value is not JSON-serializable, ignoring', name);
+               ^
+ReferenceError: console is not defined
+      at setGlobal (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/WorkerQuickJSProvider.ts:69:11)
+      at injectPolyfills (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.ts:373:18)
+      at initializeRuntime (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.ts:334:10)
+      at async loadBundle (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.ts:260:18)
+      at async <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.worker.jsx.complex.e2e.test.ts:44:18)
+(fail) WorkerQuickJSProvider JSX complex templates e2e > should evaluate nested/jsxs with children arrays and deep props [26.12ms]
+
+../../../../../../../Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.worker.react.e2e.test.ts:
+64 |         try {
+65 |           JSON.stringify(value);
+66 |           post({ type: 'setGlobal', name, value });
+67 |         } catch {
+68 |           // eslint-disable-next-line no-console
+69 |           console.warn('[WorkerQuickJSProvider] setGlobal value is not JSON-serializable, ignoring', name);
+               ^
+ReferenceError: console is not defined
+      at setGlobal (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/WorkerQuickJSProvider.ts:69:11)
+      at injectPolyfills (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.ts:373:18)
+      at initializeRuntime (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.ts:334:10)
+      at async loadBundle (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.ts:260:18)
+      at async <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.worker.react.e2e.test.ts:22:18)
+(fail) WorkerQuickJSProvider React/JSXRuntime rich shim e2e > should evaluate basic React.createElement and ReactJSXRuntime output [25.50ms]
+
+../../../../../../../Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.worker.jsx.e2e.test.ts:
+64 |         try {
+65 |           JSON.stringify(value);
+66 |           post({ type: 'setGlobal', name, value });
+67 |         } catch {
+68 |           // eslint-disable-next-line no-console
+69 |           console.warn('[WorkerQuickJSProvider] setGlobal value is not JSON-serializable, ignoring', name);
+               ^
+ReferenceError: console is not defined
+      at setGlobal (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/WorkerQuickJSProvider.ts:69:11)
+      at injectPolyfills (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.ts:373:18)
+      at initializeRuntime (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.ts:334:10)
+      at async loadBundle (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.ts:260:18)
+      at async <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.worker.jsx.e2e.test.ts:23:18)
+(fail) WorkerQuickJSProvider JSX shim e2e > should evaluate JSX with pre-injected React/JSXRuntime shims [25.09ms]
+
+../../../../../../../Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/registry.test.ts:
+34 |       expect(registry.get('View')).toBe(MockView);
+35 |       expect(registry.size).toBe(1);
+36 |     });
+37 | 
+38 |     it('should overwrite existing component with warning', () => {
+39 |       const consoleSpy = spyOn(console, 'warn').mockImplementation(() => {});
+                                    ^
+ReferenceError: console is not defined
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/registry.test.ts:39:32)
+(fail) ComponentRegistry > register > should overwrite existing component with warning [0.19ms]
+
+../../../../../../../Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:
+209 |     const now = Date.now();
+210 |     const timeSinceLastFlush = now - this.lastFlushTime;
+211 | 
+212 |     if (timeSinceLastFlush >= this.config.throttleMs) {
+213 |       // Use microtask to ensure synchronous code completes
+214 |       queueMicrotask(() => this.flush());
+            ^
+ReferenceError: queueMicrotask is not defined
+      at scheduleFlush (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.ts:214:7)
+      at enqueue (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.ts:180:10)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:153:17)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:150:47)
+(fail) ThrottledScheduler > enqueue > should schedule flush after enqueue [0.36ms]
+209 |     const now = Date.now();
+210 |     const timeSinceLastFlush = now - this.lastFlushTime;
+211 | 
+212 |     if (timeSinceLastFlush >= this.config.throttleMs) {
+213 |       // Use microtask to ensure synchronous code completes
+214 |       queueMicrotask(() => this.flush());
+            ^
+ReferenceError: queueMicrotask is not defined
+      at scheduleFlush (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.ts:214:7)
+      at enqueue (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.ts:180:10)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:167:17)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:164:42)
+(fail) ThrottledScheduler > enqueue > should batch multiple enqueues [0.05ms]
+209 |     const now = Date.now();
+210 |     const timeSinceLastFlush = now - this.lastFlushTime;
+211 | 
+212 |     if (timeSinceLastFlush >= this.config.throttleMs) {
+213 |       // Use microtask to ensure synchronous code completes
+214 |       queueMicrotask(() => this.flush());
+            ^
+ReferenceError: queueMicrotask is not defined
+      at scheduleFlush (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.ts:214:7)
+      at enqueue (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.ts:180:10)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:183:17)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:180:62)
+(fail) ThrottledScheduler > enqueue > should flush immediately when maxBatchSize reached [0.09ms]
+209 |     const now = Date.now();
+210 |     const timeSinceLastFlush = now - this.lastFlushTime;
+211 | 
+212 |     if (timeSinceLastFlush >= this.config.throttleMs) {
+213 |       // Use microtask to ensure synchronous code completes
+214 |       queueMicrotask(() => this.flush());
+            ^
+ReferenceError: queueMicrotask is not defined
+      at scheduleFlush (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.ts:214:7)
+      at enqueue (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.ts:180:10)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:193:17)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:190:48)
+(fail) ThrottledScheduler > enqueue > should merge operations when enabled [0.08ms]
+209 |     const now = Date.now();
+210 |     const timeSinceLastFlush = now - this.lastFlushTime;
+211 | 
+212 |     if (timeSinceLastFlush >= this.config.throttleMs) {
+213 |       // Use microtask to ensure synchronous code completes
+214 |       queueMicrotask(() => this.flush());
+            ^
+ReferenceError: queueMicrotask is not defined
+      at scheduleFlush (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.ts:214:7)
+      at enqueue (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.ts:180:10)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:209:17)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:206:42)
+(fail) ThrottledScheduler > enqueue > should not merge when disabled [0.07ms]
+209 |     const now = Date.now();
+210 |     const timeSinceLastFlush = now - this.lastFlushTime;
+211 | 
+212 |     if (timeSinceLastFlush >= this.config.throttleMs) {
+213 |       // Use microtask to ensure synchronous code completes
+214 |       queueMicrotask(() => this.flush());
+            ^
+ReferenceError: queueMicrotask is not defined
+      at scheduleFlush (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.ts:214:7)
+      at enqueueAll (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.ts:199:10)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:223:17)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:220:54)
+(fail) ThrottledScheduler > enqueueAll > should enqueue multiple operations at once [0.08ms]
+209 |     const now = Date.now();
+210 |     const timeSinceLastFlush = now - this.lastFlushTime;
+211 | 
+212 |     if (timeSinceLastFlush >= this.config.throttleMs) {
+213 |       // Use microtask to ensure synchronous code completes
+214 |       queueMicrotask(() => this.flush());
+            ^
+ReferenceError: queueMicrotask is not defined
+      at scheduleFlush (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.ts:214:7)
+      at enqueue (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.ts:180:10)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:248:17)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:245:59)
+(fail) ThrottledScheduler > flush > should flush all pending operations immediately [0.04ms]
+209 |     const now = Date.now();
+210 |     const timeSinceLastFlush = now - this.lastFlushTime;
+211 | 
+212 |     if (timeSinceLastFlush >= this.config.throttleMs) {
+213 |       // Use microtask to ensure synchronous code completes
+214 |       queueMicrotask(() => this.flush());
+            ^
+ReferenceError: queueMicrotask is not defined
+      at scheduleFlush (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.ts:214:7)
+      at enqueue (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.ts:180:10)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:258:17)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:255:51)
+(fail) ThrottledScheduler > flush > should increment batchId for each flush [0.05ms]
+209 |     const now = Date.now();
+210 |     const timeSinceLastFlush = now - this.lastFlushTime;
+211 | 
+212 |     if (timeSinceLastFlush >= this.config.throttleMs) {
+213 |       // Use microtask to ensure synchronous code completes
+214 |       queueMicrotask(() => this.flush());
+            ^
+ReferenceError: queueMicrotask is not defined
+      at scheduleFlush (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.ts:214:7)
+      at enqueue (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.ts:180:10)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:274:17)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:270:35)
+(fail) ThrottledScheduler > throttling > should throttle flushes [0.15ms]
+209 |     const now = Date.now();
+210 |     const timeSinceLastFlush = now - this.lastFlushTime;
+211 | 
+212 |     if (timeSinceLastFlush >= this.config.throttleMs) {
+213 |       // Use microtask to ensure synchronous code completes
+214 |       queueMicrotask(() => this.flush());
+            ^
+ReferenceError: queueMicrotask is not defined
+      at scheduleFlush (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.ts:214:7)
+      at enqueue (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.ts:180:10)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:298:17)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:295:54)
+(fail) ThrottledScheduler > dispose > should clear pending operations and timers [0.09ms]
+494 | 
+495 |     // Otherwise schedule delayed execution
+496 |     this.scheduledCallback = () => callback(scrollTop);
+497 | 
+498 |     if (!this.timeoutId) {
+499 |       this.timeoutId = setTimeout(() => {
+                             ^
+ReferenceError: setTimeout is not defined
+      at onScroll (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.ts:499:24)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:485:17)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:483:41)
+(fail) ScrollThrottler > onScroll > should throttle rapid scrolls
+11 |   PerformanceMonitor,
+12 | } from './performance';
+13 | import type { Operation, OperationBatch } from '../types';
+14 | 
+15 | // Helper to wait for real time
+16 | const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+                                                          ^
+ReferenceError: setTimeout is not defined
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:16:54)
+      at new Promise (1:11)
+      at sleep (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:16:31)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:504:13)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:500:66)
+(fail) ScrollThrottler > onScroll > should allow immediate execution after throttle period [0.17ms]
+494 | 
+495 |     // Otherwise schedule delayed execution
+496 |     this.scheduledCallback = () => callback(scrollTop);
+497 | 
+498 |     if (!this.timeoutId) {
+499 |       this.timeoutId = setTimeout(() => {
+                             ^
+ReferenceError: setTimeout is not defined
+      at onScroll (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.ts:499:24)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:517:17)
+      at <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/performance.test.ts:515:43)
+(fail) ScrollThrottler > dispose > should cancel pending callbacks [0.08ms]
+
+../../../../../../../Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.timeout.test.ts:
+274 |         : null;
+275 | 
+276 |       try {
+277 |         await this.executeBundle(code);
+278 |         if (timedOut) {
+279 |           throw new TimeoutError(`[rill] Execution exceeded timeout ${this.options.timeout}ms`);
+                      ^
+TimeoutError: [rill] Execution exceeded timeout 1ms
+      at loadBundle (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.ts:279:17)
+      at async <anonymous> (/Users/leo/XData/Starbucks/GoAskAway/rill/packages/rill/src/runtime/engine.timeout.test.ts:70:18)
+(fail) Engine timeout behavior > does not throw TimeoutError even for long sync work (best-effort guard) [15.40ms]
+
+ 381 pass
+ 20 fail
+ 1 error
+ 678 expect() calls
+Ran 401 tests across 44 files. [5.71s]

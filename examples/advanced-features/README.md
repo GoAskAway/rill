@@ -18,7 +18,7 @@ Monitor engine performance in real-time and identify bottlenecks:
 
 ```tsx
 const engine = new Engine({
-  quickjs: provider,
+  provider: provider,
   onMetric: (name, value, extra) => {
     console.log(`[Metric] ${name}: ${value}ms`, extra);
 
@@ -36,18 +36,18 @@ const engine = new Engine({
 ```
 
 **Built-in Metrics:**
-- `engine.loadBundle` - Plugin load time
+- `engine.loadBundle` - Guest load time
 - `engine.sendToSandbox` - Message passing to sandbox time
 - `receiver.render` - Render operation time
 - `receiver.applyOperations` - Operation application time
 
 ### 2. Execution Timeout Protection (timeout)
 
-Prevent infinite loops or long-running operations in plugins:
+Prevent infinite loops or long-running operations in guests:
 
 ```tsx
 const engine = new Engine({
-  quickjs: provider,
+  provider: provider,
   timeout: 5000,  // 5 second timeout
 });
 ```
@@ -61,11 +61,11 @@ const engine = new Engine({
 
 ### 3. Module Whitelist (requireWhitelist)
 
-Control which modules plugins can access to improve security:
+Control which modules guests can access to improve security:
 
 ```tsx
 const engine = new Engine({
-  quickjs: provider,
+  provider: provider,
   requireWhitelist: [
     'lodash',           // Utility library
     'date-fns',         // Date handling
@@ -106,7 +106,7 @@ setInterval(() => {
 
   // Too many errors, reload
   if (health.errorCount > 10) {
-    console.error('Too many errors, reloading plugin');
+    console.error('Too many errors, reloading guest');
     engine.destroy();
     // Recreate and reload
   }
@@ -125,7 +125,7 @@ Limit single operation batch size to protect host performance:
 
 ```tsx
 const engine = new Engine({
-  quickjs: provider,
+  provider: provider,
   receiverMaxBatchSize: 5000,  // Default value
 });
 ```
@@ -141,7 +141,7 @@ Integrate with your application's logging system:
 
 ```tsx
 const engine = new Engine({
-  quickjs: provider,
+  provider: provider,
   logger: {
     log: (...args) => {
       myLogger.info('[Rill]', ...args);
@@ -164,7 +164,7 @@ Enable detailed logging during development:
 
 ```tsx
 const engine = new Engine({
-  quickjs: provider,
+  provider: provider,
   debug: __DEV__,  // Auto-enable in React Native dev environment
 });
 ```
@@ -213,7 +213,7 @@ class MetricsCollector {
 const collector = new MetricsCollector();
 
 const engine = new Engine({
-  quickjs: provider,
+  provider: provider,
   onMetric: (name, value) => collector.onMetric(name, value),
 });
 
@@ -229,7 +229,7 @@ Automatically detect performance issues:
 
 ```tsx
 const engine = new Engine({
-  quickjs: provider,
+  provider: provider,
   onMetric: (name, value) => {
     // Render exceeds 16ms (60fps)
     if (name === 'receiver.render' && value > 16) {
@@ -238,7 +238,7 @@ const engine = new Engine({
 
     // Load exceeds 1 second
     if (name === 'engine.loadBundle' && value > 1000) {
-      console.warn('⚠️ Slow plugin load:', value, 'ms');
+      console.warn('⚠️ Slow guest load:', value, 'ms');
     }
 
     // Message passing exceeds 10ms
@@ -255,7 +255,7 @@ const engine = new Engine({
 
 ```tsx
 const engine = new Engine({
-  quickjs: provider,
+  provider: provider,
 
   // 5 second timeout
   timeout: 5000,

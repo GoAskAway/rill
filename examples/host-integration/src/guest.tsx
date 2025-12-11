@@ -1,5 +1,5 @@
 /**
- * Plugin example code
+ * Guest example code
  * This code runs inside QuickJS sandbox
  */
 
@@ -19,7 +19,7 @@ interface Config {
   theme?: 'light' | 'dark';
 }
 
-export default function Plugin() {
+export default function Guest() {
   const config = useConfig<Config>();
   const sendToHost = useSendToHost();
   const [messages, setMessages] = useState<string[]>([]);
@@ -37,7 +37,7 @@ export default function Plugin() {
 
   // Send message to host
   const handleSendToHost = () => {
-    sendToHost('PLUGIN_ACTION', {
+    sendToHost('GUEST_ACTION', {
       timestamp: Date.now(),
       userId: config.userId,
       action: 'button_clicked',
@@ -125,7 +125,7 @@ export default function Plugin() {
             Integration Guide
           </Text>
           <Text style={{ color: textColor, fontSize: 14, lineHeight: 20 }}>
-            This example demonstrates the complete communication flow between plugin and host:
+            This example demonstrates the complete communication flow between guest and host:
           </Text>
           <Text style={{ color: textColor, fontSize: 14, marginTop: 8 }}>
             • useHostEvent - Listen to host events

@@ -18,7 +18,7 @@
 
 ```tsx
 const engine = new Engine({
-  quickjs: provider,
+  provider: provider,
   onMetric: (name, value, extra) => {
     console.log(`[Metric] ${name}: ${value}ms`, extra);
 
@@ -36,18 +36,18 @@ const engine = new Engine({
 ```
 
 **内置指标:**
-- `engine.loadBundle` - 插件加载时间
+- `engine.loadBundle` - guest加载时间
 - `engine.sendToSandbox` - 消息传递到沙箱的时间
 - `receiver.render` - 渲染操作时间
 - `receiver.applyOperations` - 操作应用时间
 
 ### 2. 执行超时保护 (timeout)
 
-防止插件中的无限循环或长时间运行:
+防止guest中的无限循环或长时间运行:
 
 ```tsx
 const engine = new Engine({
-  quickjs: provider,
+  provider: provider,
   timeout: 5000,  // 5秒超时
 });
 ```
@@ -61,11 +61,11 @@ const engine = new Engine({
 
 ### 3. 模块白名单 (requireWhitelist)
 
-控制插件可以访问的模块,提高安全性:
+控制guest可以访问的模块,提高安全性:
 
 ```tsx
 const engine = new Engine({
-  quickjs: provider,
+  provider: provider,
   requireWhitelist: [
     'lodash',           // 工具库
     'date-fns',         // 日期处理
@@ -106,7 +106,7 @@ setInterval(() => {
 
   // 错误过多,重新加载
   if (health.errorCount > 10) {
-    console.error('Too many errors, reloading plugin');
+    console.error('Too many errors, reloading guest');
     engine.destroy();
     // 重新创建和加载
   }
@@ -125,7 +125,7 @@ setInterval(() => {
 
 ```tsx
 const engine = new Engine({
-  quickjs: provider,
+  provider: provider,
   receiverMaxBatchSize: 5000,  // 默认值
 });
 ```
@@ -141,7 +141,7 @@ const engine = new Engine({
 
 ```tsx
 const engine = new Engine({
-  quickjs: provider,
+  provider: provider,
   logger: {
     log: (...args) => {
       myLogger.info('[Rill]', ...args);
@@ -164,7 +164,7 @@ const engine = new Engine({
 
 ```tsx
 const engine = new Engine({
-  quickjs: provider,
+  provider: provider,
   debug: __DEV__,  // React Native 开发环境自动启用
 });
 ```
@@ -213,7 +213,7 @@ class MetricsCollector {
 const collector = new MetricsCollector();
 
 const engine = new Engine({
-  quickjs: provider,
+  provider: provider,
   onMetric: (name, value) => collector.onMetric(name, value),
 });
 
@@ -229,7 +229,7 @@ setInterval(() => {
 
 ```tsx
 const engine = new Engine({
-  quickjs: provider,
+  provider: provider,
   onMetric: (name, value) => {
     // 渲染超过 16ms (60fps)
     if (name === 'receiver.render' && value > 16) {
@@ -238,7 +238,7 @@ const engine = new Engine({
 
     // 加载超过 1 秒
     if (name === 'engine.loadBundle' && value > 1000) {
-      console.warn('⚠️ Slow plugin load:', value, 'ms');
+      console.warn('⚠️ Slow guest load:', value, 'ms');
     }
 
     // 消息传递超过 10ms
@@ -255,7 +255,7 @@ const engine = new Engine({
 
 ```tsx
 const engine = new Engine({
-  quickjs: provider,
+  provider: provider,
 
   // 5秒超时
   timeout: 5000,

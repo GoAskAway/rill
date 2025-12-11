@@ -6,10 +6,11 @@ Lightweight, headless, sandboxed React Native dynamic UI rendering engine.
 
 ## Features
 
-- **React-like Development Experience**: Write plugins using JSX and Hooks
-- **Complete Sandbox Isolation**: Based on QuickJS, plugin crashes don't affect the host
+- **React-like Development Experience**: Write bundles using JSX and Hooks
+- **Complete Sandbox Isolation**: Multiple sandbox modes (vm, worker) - guest crashes don't affect the host
 - **Lightweight and Efficient**: No WebView overhead, native rendering performance
 - **Flexible Extension**: Supports registering custom business components
+- **Multi-tenant Support**: `PooledEngine` for resource sharing and fault isolation
 
 ## Quick Start
 
@@ -18,7 +19,7 @@ Lightweight, headless, sandboxed React Native dynamic UI rendering engine.
 Compatibility and peer dependencies
 
 - Keep React and react-reconciler in compatible pairs to avoid install/runtime issues.
-- Choose only one platform peer: react-dom (Web) or react-native (RN). react-native-quickjs is optional for RN.
+- Choose only one platform peer: react-dom (Web) or react-native (RN).
 
 Recommended pairings
 
@@ -28,21 +29,12 @@ Recommended pairings
 
 Install examples
 
-- React Native (RN 0.82 + React 19.2)
-  - npm i rill react@^19.2.1 react-native@^0.82 react-reconciler@^0.33
-- Web (React 19.2)
-  - npm i rill react@^19.2.1 react-dom@^19.2.1 react-reconciler@^0.33
-
-Notes
-
-- If you see npm ERESOLVE complaining react-reconciler@0.33 requires react@^19.2: upgrade React to ^19.2.1 (or align reconciler to 0.32 if you must stay on React 19.0).
-- Avoid using --legacy-peer-deps in the long term; fix the pairing instead.
-
-
 ```bash
-npm install rill
-# or
-yarn add rill
+# React Native (RN 0.82 + React 19.2)
+bun add rill react@^19.2.1 react-native@^0.82 react-reconciler@^0.33
+
+# Web (React 19.2)
+bun add rill react@^19.2.1 react-dom@^19.2.1 react-reconciler@^0.33
 ```
 
 ### Host Integration
@@ -59,26 +51,26 @@ engine.register({
   StepList: NativeStepList,
 });
 
-// 3. Render plugin
+// 3. Render guest bundle
 function App() {
   return (
     <EngineView
       engine={engine}
-      bundleUrl="https://cdn.example.com/plugin.js"
+      bundleUrl="https://cdn.example.com/bundle.js"
       initialProps={{ theme: 'dark' }}
-      onLoad={() => console.log('Plugin loaded')}
-      onError={(err) => console.error('Plugin error:', err)}
+      onLoad={() => console.log('Bundle loaded')}
+      onError={(err) => console.error('Bundle error:', err)}
     />
   );
 }
 ```
 
-### Plugin Development
+### Guest Bundle Development
 
 ```tsx
 import { View, Text, TouchableOpacity, useHostEvent, useConfig } from 'rill/sdk';
 
-export default function MyPlugin() {
+export default function MyBundle() {
   const config = useConfig<{ theme: string }>();
 
   useHostEvent('REFRESH', () => {
@@ -87,7 +79,7 @@ export default function MyPlugin() {
 
   return (
     <View style={{ flex: 1, padding: 20 }}>
-      <Text style={{ fontSize: 24 }}>Hello from Plugin!</Text>
+      <Text style={{ fontSize: 24 }}>Hello from Guest!</Text>
       <Text>Theme: {config.theme}</Text>
       <TouchableOpacity onPress={() => console.log('Pressed!')}>
         <Text>Click Me</Text>
@@ -97,31 +89,33 @@ export default function MyPlugin() {
 }
 ```
 
-### Build Plugin
+### Build Bundle
 
 ```bash
 # Install CLI
-npm install -g rill
+bun add -g @anthropic/rill-cli
 
 # Build
-rill build src/plugin.tsx -o dist/bundle.js
+rill build src/bundle.tsx -o dist/bundle.js
 
 # Development mode
-rill build src/plugin.tsx --watch --no-minify --sourcemap
+rill build src/bundle.tsx --watch --no-minify --sourcemap
 ```
 
 ## Architecture
+
+### High-Level Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                       Host App (React Native)                    │
 ├─────────────────────────────────────────────────────────────────┤
-│  EngineView → Engine → QuickJS Context                          │
+│  EngineView → Engine → JS Sandbox (vm/worker/none)              │
 │                            │                                     │
 │                            ▼                                     │
 │                    ┌───────────────────┐                        │
-│                    │  Plugin Bundle.js  │                        │
-│                    │  (React + SDK)     │                        │
+│                    │   Guest Bundle.js  │                        │
+│                    │   (React + SDK)    │                        │
 │                    └───────────────────┘                        │
 │                            │                                     │
 │                            ▼                                     │
@@ -132,34 +126,125 @@ rill build src/plugin.tsx --watch --no-minify --sourcemap
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+### Detailed Data Flow
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                    Host (Native Environment)                      │
+│  React Native App / Node.js / Browser                            │
+│                                                                   │
+│  ┌────────────────────────────────────────────┐                 │
+│  │  Engine (runtime/engine.ts)                │                 │
+│  │  ├─ Create sandbox (QuickJS/Worker/VM)     │                 │
+│  │  ├─ Inject reconciler into sandbox         │                 │
+│  │  └─ Receive operations from Guest          │                 │
+│  └────────────────┬───────────────────────────┘                 │
+│                   │ ↑                                            │
+│                   │ │ sendToHost(OperationBatch)                │
+│                   │ │ { operations: [...] }                     │
+└───────────────────┼─┼──────────────────────────────────────────┘
+                    │ │
+                    │ │ JSON Messages
+                    │ │
+┌───────────────────┼─┼──────────────────────────────────────────┐
+│         Sandbox   │ │  (Isolated JS Environment)                │
+│    QuickJS / Web Worker / Node VM                               │
+│                   │ │                                            │
+│  ┌────────────────┼─┼─────────────────┐                        │
+│  │  Guest Code    │ │                 │                        │
+│  │  (User's React Bundle)             │                        │
+│  │                ↓ │                 │                        │
+│  │  import { render } from 'rill/reconciler';                  │
+│  │  import { View, Text } from 'rill/sdk';                     │
+│  │                  │                 │                        │
+│  │  <View>          │                 │                        │
+│  │    <Text>Hello</Text>              │                        │
+│  │  </View>         │                 │                        │
+│  └──────────────────┼─────────────────┘                        │
+│                     │                                            │
+│  ┌──────────────────┼─────────────────┐                        │
+│  │  Reconciler      ↓                 │                        │
+│  │  (reconciler/index.ts)             │                        │
+│  │                                     │                        │
+│  │  1. React components → Fiber nodes │                        │
+│  │  2. Calculate diffs (React Fiber)  │                        │
+│  │  3. Generate JSON operations:      │                        │
+│  │     { op: 'CREATE', type: 'View', props: {...} }            │
+│  │     { op: 'APPEND', id: 2, parentId: 1 }                    │
+│  │  4. Call sendToHost() ─────────────────┘                    │
+│  │     Send operations to Host                                 │
+│  └─────────────────────────────────────────────────────────────┘
+└──────────────────────────────────────────────────────────────────┘
+```
+
+**Key Points:**
+
+- **Reconciler runs in Sandbox**: The React reconciler executes inside the isolated environment, converting React components to JSON operations
+- **sendToHost direction**: Sandbox → Host (operations flow from guest to host)
+- **Complete isolation**: Guest code crashes don't affect the host app
+- **Zero WebView overhead**: Direct React reconciliation to native components
+
+## Engine Types
+
+### Engine (Standalone)
+
+Each engine has its own dedicated JS sandbox - suitable for single-tenant scenarios.
+
+```typescript
+const engine = new Engine({ sandbox: 'vm' });
+```
+
+### PooledEngine (Multi-tenant)
+
+Multiple engines share a worker pool - suitable for multi-tenant scenarios with resource limits and fault isolation.
+
+```typescript
+import { PooledEngine, createWorkerPool } from 'rill';
+
+// Simple usage - uses global pool
+const engine = new PooledEngine();
+
+// Custom pool with limits
+const pool = createWorkerPool({ maxWorkers: 4 });
+const engine = new PooledEngine({ pool });
+```
+
 ## Module Description
 
 | Module | Path | Description |
 |--------|------|-------------|
-| SDK | `rill/sdk` | Plugin development kit, virtual components and Hooks |
-| Runtime | `rill` | Host runtime, Engine and EngineView |
-| CLI | `rill` (bin) | Plugin bundler tool |
+| SDK | `rill/sdk` | Guest development kit, virtual components and Hooks |
+| Runtime | `rill` | Host runtime, Engine/PooledEngine and EngineView |
+| CLI | `@anthropic/rill-cli` | Bundle compiler tool |
 
 ## API
 
 ### Engine
 
 ```typescript
+import { Engine, PooledEngine } from 'rill';
+
+// Standalone engine
 const engine = new Engine(options?: EngineOptions);
 
+// Pooled engine (multi-tenant)
+const pooledEngine = new PooledEngine(options?: PooledEngineOptions);
+
 interface EngineOptions {
-  timeout?: number;      // Execution timeout (default 5000ms)
-  debug?: boolean;       // Debug mode
-  logger?: Logger;       // Custom logger
+  sandbox?: 'vm' | 'worker' | 'none';  // Sandbox mode (auto-detected if not set)
+  provider?: JSEngineProvider;          // Custom provider
+  timeout?: number;                     // Execution timeout (default 5000ms)
+  debug?: boolean;                      // Debug mode
+  logger?: Logger;                      // Custom logger
 }
 
 // Register components
 engine.register({ ComponentName: ReactComponent });
 
-// Load plugin
+// Load bundle
 await engine.loadBundle(bundleUrl, initialProps);
 
-// Send event to plugin
+// Send event to guest
 engine.sendEvent('EVENT_NAME', payload);
 
 // Update configuration
@@ -248,22 +333,22 @@ const data = devtools.exportAll();
 
 ```bash
 # Install dependencies
-npm install
+bun install
 
 # Build
-npm run build
+bun run build
 
 # Development mode
-npm run build:watch
+bun run build:watch
 
 # Type check
-npm run typecheck
+bun run typecheck
 
 # Test
-npm run test
+bun test
 
 # Test coverage
-npm run test:coverage
+bun test --coverage
 ```
 
 ## Testing
@@ -275,9 +360,9 @@ The project includes a complete test suite:
 - Coverage target: 80%+ code coverage
 
 ```bash
-npm test           # Run all tests
-npm test -- --run  # Single run
-npm test:coverage  # Generate coverage report
+bun test           # Run all tests
+bun test --watch   # Watch mode
+bun test --coverage  # Generate coverage report
 ```
 
 ## License

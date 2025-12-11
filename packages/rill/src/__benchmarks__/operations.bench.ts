@@ -15,7 +15,7 @@ import {
 } from '../runtime/performance';
 import { benchmark } from './utils/benchmark';
 import type { BenchmarkResult } from './utils/benchmark';
-import type { Operation } from '../types';
+import type { Operation, OperationBatch } from '../types';
 
 describe('Operations Benchmarks', () => {
   const results: BenchmarkResult[] = [];

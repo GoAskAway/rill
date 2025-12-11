@@ -8,7 +8,7 @@ Rill is a lightweight React Native dynamic UI rendering engine that allows runni
 
 ```
 rill/
-├── sdk          # Plugin-side SDK (runs in sandbox)
+├── sdk          # Guest-side SDK (runs in sandbox)
 ├── runtime      # Host-side runtime
 ├── reconciler   # React reconciler
 └── devtools     # Debugging tools
@@ -18,7 +18,7 @@ rill/
 
 ## SDK (rill/sdk)
 
-SDK used by plugin developers, runs in the QuickJS sandbox.
+SDK used by guest developers, runs in the QuickJS sandbox.
 
 ### Virtual Components
 
@@ -227,7 +227,7 @@ Listen to host events.
 ```tsx
 import { useHostEvent } from 'rill/sdk';
 
-function Plugin() {
+function Guest() {
   useHostEvent<{ force: boolean }>('REFRESH', (payload) => {
     console.log('Refreshing...', payload.force);
   });
@@ -253,7 +253,7 @@ interface Config {
   userId: string;
 }
 
-function Plugin() {
+function Guest() {
   const config = useConfig<Config>();
 
   return <Text>Theme: {config.theme}</Text>;
@@ -271,7 +271,7 @@ Send events to host.
 ```tsx
 import { useSendToHost } from 'rill/sdk';
 
-function Plugin() {
+function Guest() {
   const sendToHost = useSendToHost();
 
   const handleComplete = () => {
@@ -311,17 +311,17 @@ engine.register({
   CustomButton: MyButton,
 });
 
-// Load and execute plugin
-await engine.loadBundle('https://cdn.example.com/plugin.js', {
+// Load and execute guest
+await engine.loadBundle('https://cdn.example.com/guest.js', {
   theme: 'dark',
   userId: '12345',
 });
 
 // Listen to events
-engine.on('load', () => console.log('Plugin loaded'));
-engine.on('error', (error) => console.error('Plugin error:', error));
+engine.on('load', () => console.log('Guest loaded'));
+engine.on('error', (error) => console.error('Guest error:', error));
 engine.on('operation', (batch) => console.log('Operations:', batch));
-engine.on('destroy', () => console.log('Plugin destroyed'));
+engine.on('destroy', () => console.log('Guest destroyed'));
 
 // Send events to sandbox
 engine.sendEvent('REFRESH', { force: true });
@@ -346,7 +346,7 @@ engine.destroy();
 | Method | Parameters | Return | Description |
 |--------|------------|--------|-------------|
 | register | components: ComponentMap | void | Register components |
-| loadBundle | source: string, props?: object | Promise\<void\> | Load plugin |
+| loadBundle | source: string, props?: object | Promise\<void\> | Load guest |
 | sendEvent | eventName: string, payload?: unknown | void | Send event |
 | updateConfig | config: object | void | Update configuration |
 | destroy | - | void | Destroy engine |
@@ -365,10 +365,10 @@ React Native component for rendering engine output.
 ```tsx
 import { EngineView } from 'rill/runtime';
 
-function PluginContainer() {
+function GuestContainer() {
   return (
     <EngineView
-      source="https://cdn.example.com/plugin.js"
+      source="https://cdn.example.com/guest.js"
       initialProps={{ theme: 'dark' }}
       components={{ CustomButton: MyButton }}
       onLoad={() => console.log('Loaded')}
@@ -623,25 +623,25 @@ const exported = timeline.export();
 
 ## CLI (rill/cli)
 
-Command-line tool for building plugins.
+Command-line tool for building guests.
 
 ### Build Command
 
 ```bash
-# Build plugin
-npx rill build src/plugin.tsx -o dist/bundle.js
+# Build guest
+npx rill build src/guest.tsx -o dist/bundle.js
 
 # Watch mode
-npx rill build src/plugin.tsx -o dist/bundle.js --watch
+npx rill build src/guest.tsx -o dist/bundle.js --watch
 
 # Generate sourcemap
-npx rill build src/plugin.tsx -o dist/bundle.js --sourcemap
+npx rill build src/guest.tsx -o dist/bundle.js --sourcemap
 
 # No minification
-npx rill build src/plugin.tsx -o dist/bundle.js --no-minify
+npx rill build src/guest.tsx -o dist/bundle.js --no-minify
 
 # Generate metafile
-npx rill build src/plugin.tsx -o dist/bundle.js --metafile dist/meta.json
+npx rill build src/guest.tsx -o dist/bundle.js --metafile dist/meta.json
 ```
 
 ### Analyze Command
@@ -657,7 +657,7 @@ npx rill analyze dist/bundle.js
 import { build, analyze } from 'rill/cli';
 
 await build({
-  entry: 'src/plugin.tsx',
+  entry: 'src/guest.tsx',
   outfile: 'dist/bundle.js',
   minify: true,
   sourcemap: false,
@@ -798,17 +798,17 @@ type StyleProp = StyleObject | StyleObject[] | null | undefined;
 
 ### Sandbox Error Isolation
 
-Errors in plugins don't affect the host application:
+Errors in guests don't affect the host application:
 
 ```tsx
-// Errors in plugin code are caught
-function BuggyPlugin() {
-  throw new Error('Plugin crashed!');
+// Errors in guest code are caught
+function BuggyGuest() {
+  throw new Error('Guest crashed!');
 }
 
 // Host-side handling
 engine.on('error', (error) => {
-  console.error('Plugin error:', error);
+  console.error('Guest error:', error);
   // Show fallback UI
 });
 ```

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, mock } from 'bun:test';
 import { Receiver } from './receiver';
 import { createRegistry } from './registry';
 import React from 'react';
@@ -25,7 +25,7 @@ describe('Receiver render metrics - complex tree', () => {
     // register a minimal component to render
     const Dummy = (props: any) => React.createElement('div', props, props.children);
     registry.register('View', Dummy as any);
-    const onMetric = vi.fn();
+    const onMetric = mock();
     const receiver = new Receiver(registry, () => {}, () => {}, { onMetric });
 
     const batch = makeTree(3, 3); // 1 + 3 + 9 + 27 nodes total created, but appended subset; depends on ops

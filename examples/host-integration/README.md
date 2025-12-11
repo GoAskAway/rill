@@ -1,10 +1,10 @@
 # Host Integration Example
 
-This example demonstrates how to fully integrate the Rill plugin system into a React Native application, including:
+This example demonstrates how to fully integrate the Rill guest system into a React Native application, including:
 
 - ✅ Engine instance creation and configuration
 - ✅ EngineView lifecycle management
-- ✅ Bidirectional host-plugin communication
+- ✅ Bidirectional host-guest communication
 - ✅ Error handling and recovery
 - ✅ Custom component registration
 - ✅ QuickJS Provider configuration
@@ -14,18 +14,18 @@ This example demonstrates how to fully integrate the Rill plugin system into a R
 ```
 host-integration/
 ├── src/
-│   ├── plugin.tsx           # Plugin code (runs in sandbox)
+│   ├── guest.tsx           # Guest code (runs in sandbox)
 │   ├── HostApp.tsx           # Host application example
 │   └── QuickJSProvider.tsx   # QuickJS Provider configuration
 ├── dist/
-│   └── plugin.js             # Built plugin bundle
+│   └── guest.js             # Built guest bundle
 ├── package.json
 └── README.md
 ```
 
 ## Quick Start
 
-### 1. Build the Plugin
+### 1. Build the Guest
 
 ```bash
 npm install
@@ -42,7 +42,7 @@ import { createQuickJSProvider } from './QuickJSProvider';
 
 // Create Engine instance
 const engine = new Engine({
-  quickjs: createQuickJSProvider(),
+  provider: createQuickJSProvider(),
   timeout: 5000,
   debug: true,
 });
@@ -55,10 +55,10 @@ engine.register({
 // Use in component
 <EngineView
   engine={engine}
-  bundleUrl="./dist/plugin.js"  // or remote URL
+  bundleUrl="./dist/guest.js"  // or remote URL
   initialProps={{ userId: '123' }}
-  onLoad={() => console.log('Plugin loaded')}
-  onError={(err) => console.error('Plugin error:', err)}
+  onLoad={() => console.log('Guest loaded')}
+  onError={(err) => console.error('Guest error:', err)}
 />
 ```
 
@@ -69,7 +69,7 @@ engine.register({
 ```tsx
 const engine = new Engine({
   // QuickJS provider (required)
-  quickjs: createQuickJSProvider(),
+  provider: createQuickJSProvider(),
 
   // Execution timeout (milliseconds)
   timeout: 5000,
@@ -96,29 +96,29 @@ const engine = new Engine({
 
 ### 2. Bidirectional Communication
 
-**Host sends events to plugin:**
+**Host sends events to guest:**
 
 ```tsx
 // In host code
 engine.sendEvent('THEME_CHANGE', { theme: 'dark' });
 ```
 
-**Plugin sends messages to host:**
+**Guest sends messages to host:**
 
 ```tsx
-// In plugin code
+// In guest code
 import { useSendToHost } from 'rill/sdk';
 
 const sendToHost = useSendToHost();
 sendToHost('USER_ACTION', { action: 'click', target: 'button' });
 ```
 
-**Host listens to plugin messages:**
+**Host listens to guest messages:**
 
 ```tsx
 // In host code
 engine.on('message', (message) => {
-  console.log('From plugin:', message.event, message.payload);
+  console.log('From guest:', message.event, message.payload);
 });
 ```
 
@@ -127,23 +127,23 @@ engine.on('message', (message) => {
 ```tsx
 <EngineView
   engine={engine}
-  bundleUrl={pluginUrl}
+  bundleUrl={guestUrl}
 
   // Load complete
   onLoad={() => {
-    console.log('Plugin ready');
+    console.log('Guest ready');
     engine.sendEvent('INIT', { config });
   }}
 
   // Error handling
   onError={(error) => {
-    console.error('Plugin error:', error);
+    console.error('Guest error:', error);
     // Report error, show fallback UI, etc.
   }}
 
   // Destroy callback
   onDestroy={() => {
-    console.log('Plugin destroyed');
+    console.log('Guest destroyed');
     // Clean up resources
   }}
 
@@ -157,7 +157,7 @@ engine.on('message', (message) => {
 
 ### 4. Custom Component Registration
 
-Expose native components to plugins:
+Expose native components to guests:
 
 ```tsx
 import { requireNativeComponent } from 'react-native';
@@ -171,13 +171,13 @@ engine.register({
 });
 ```
 
-Use in plugin:
+Use in guest:
 
 ```tsx
 import { View } from 'rill/sdk';
 
 // Automatically get registered component
-function Plugin() {
+function Guest() {
   return <MapView region={...} />;
 }
 ```
@@ -206,7 +206,7 @@ engine.on('error', (error) => {
 ### 1. Error Boundary
 
 ```tsx
-class PluginErrorBoundary extends React.Component {
+class GuestErrorBoundary extends React.Component {
   state = { hasError: false };
 
   static getDerivedStateFromError(error) {
@@ -214,7 +214,7 @@ class PluginErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, info) {
-    console.error('Plugin error:', error, info);
+    console.error('Guest error:', error, info);
   }
 
   render() {
@@ -226,21 +226,21 @@ class PluginErrorBoundary extends React.Component {
 }
 
 // Usage
-<PluginErrorBoundary>
+<GuestErrorBoundary>
   <EngineView engine={engine} bundleUrl={url} />
-</PluginErrorBoundary>
+</GuestErrorBoundary>
 ```
 
-### 2. Dynamic Plugin Loading
+### 2. Dynamic Guest Loading
 
 ```tsx
-function DynamicPlugin({ pluginId }) {
+function DynamicGuest({ guestId }) {
   const [bundleUrl, setBundleUrl] = useState(null);
 
   useEffect(() => {
-    // Fetch plugin URL from server
-    fetchPluginUrl(pluginId).then(setBundleUrl);
-  }, [pluginId]);
+    // Fetch guest URL from server
+    fetchGuestUrl(guestId).then(setBundleUrl);
+  }, [guestId]);
 
   if (!bundleUrl) return <Loader />;
 
@@ -261,7 +261,7 @@ function DynamicPlugin({ pluginId }) {
 
 ```tsx
 useEffect(() => {
-  const engine = new Engine({ quickjs });
+  const engine = new Engine({ provider });
 
   return () => {
     // Destroy engine when component unmounts
@@ -307,4 +307,4 @@ setInterval(() => {
 
 - [Engine API](../../docs/api/engine.md)
 - [EngineView API](../../docs/api/engine-view.md)
-- [Plugin Development Guide](../../docs/guides/plugin-development.md)
+- [Guest Development Guide](../../docs/guides/guest-development.md)

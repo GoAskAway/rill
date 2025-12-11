@@ -6,7 +6,7 @@ This directory contains performance benchmarks for the Rill engine, testing core
 
 The benchmark suite measures:
 
-- **Engine Performance**: Plugin loading, event handling, configuration updates
+- **Engine Performance**: Bundle loading, event handling, configuration updates
 - **Receiver Performance**: Batch processing, rendering, node tree operations
 - **Operations Performance**: Operation merging, scheduling, and throughput
 - **Memory Usage**: Memory allocation during key operations
@@ -16,20 +16,20 @@ The benchmark suite measures:
 ### Run All Benchmarks
 
 ```bash
-npm run bench
+bun bench
 ```
 
 ### Run Specific Benchmark Suites
 
 ```bash
 # Engine benchmarks only
-npm run bench:engine
+bun test --run src/__benchmarks__/engine.bench.ts
 
 # Receiver benchmarks only
-npm run bench:receiver
+bun test --run src/__benchmarks__/receiver.bench.ts
 
 # Operations benchmarks only
-npm run bench:operations
+bun test --run src/__benchmarks__/operations.bench.ts
 ```
 
 ## Benchmark Structure
@@ -65,8 +65,8 @@ Each benchmark reports the following statistics:
 | Test | Target (mean) | Description |
 |------|---------------|-------------|
 | Engine.new | < 10ms | Engine initialization time |
-| Engine.loadBundle (simple) | < 50ms | Simple plugin loading |
-| Engine.loadBundle (large) | < 200ms | Large plugin (1000 ops) loading |
+| Engine.loadBundle (simple) | < 50ms | Simple Guest loading |
+| Engine.loadBundle (large) | < 200ms | Large Guest (1000 ops) loading |
 | Engine.sendEvent | < 1ms | Event messaging latency |
 | Engine.updateConfig | < 1ms | Configuration update |
 
@@ -120,7 +120,7 @@ Consider optimization when:
 Run benchmarks and save results:
 
 ```bash
-npm run bench > baseline.txt
+bun bench > baseline.txt
 ```
 
 ### Comparing Against Baseline
@@ -154,11 +154,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: oven-sh/setup-bun@v1
         with:
-          node-version: '18'
-      - run: npm ci
-      - run: npm run bench
+          bun-version: latest
+      - run: bun install
+      - run: bun bench
       - name: Compare with baseline
         run: |
           # Compare results with stored baseline
@@ -179,10 +179,10 @@ jobs:
 1. **Run on consistent hardware**: Results vary by CPU/memory
 2. **Close other applications**: Minimize background processes
 3. **Run multiple times**: Verify consistency across runs
-4. **Use Node.js --expose-gc**: Enable GC for memory tests
+4. **Force GC when needed**: Use `Bun.gc(true)` for memory tests
 
 ```bash
-node --expose-gc ./node_modules/.bin/vitest bench
+bun test --run src/__benchmarks__/*.bench.ts
 ```
 
 ## Troubleshooting
@@ -203,7 +203,7 @@ node --expose-gc ./node_modules/.bin/vitest bench
 
 ### Memory Leaks
 
-- Use `--expose-gc` flag
+- Use `Bun.gc(true)` to force garbage collection
 - Check for event listener leaks
 - Verify proper cleanup in `afterEach`
 - Use memory profiling tools

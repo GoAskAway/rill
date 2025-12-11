@@ -4,8 +4,8 @@
   "private": true,
   "description": "Complete host-side integration example using EngineView",
   "scripts": {
-    "build": "rill build src/plugin.tsx -o dist/plugin.js",
-    "build:dev": "rill build src/plugin.tsx -o dist/plugin.js --no-minify --sourcemap"
+    "build": "rill build src/guest.tsx -o dist/guest.js",
+    "build:dev": "rill build src/guest.tsx -o dist/guest.js --no-minify --sourcemap"
   },
   "dependencies": {
     "rill": "workspace:*",

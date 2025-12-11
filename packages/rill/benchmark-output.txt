@@ -191,82 +191,118 @@ stdout | src/__benchmarks__/operations.bench.ts > O[3Jc
  PASS  Waiting for file changes...
        press h to show help, press q to quit
        rerun x14
-[2K[1A[2K[G.270ms
-  Ops/sec: 9531
-
-OperationMerger.merge (1000 mixed):
-  Mean: 0.035ms
-  Median: 0.032ms
-  Min: 0.024ms
-  Max: 0.230ms
-  Ops/sec: 28450
-
-OperationMerger.merge (no merging possible):
-  Mean: 0.004ms
-  Median: 0.004ms
-  Min: 0.003ms
-  Max: 0.096ms
-  Ops/sec: 264206
-
-ThrottledScheduler.enqueue (single):
-  Mean: 0.002ms
-  Median: 0.001ms
-  Min: 0.001ms
-  Max: 0.032ms
-  Ops/sec: 642002
-
-================================================================================
+[2K[1A[2K[G[3Jc
+ RERUN  src/runtime/receiver.ts
 
 
-stdout | src/__benchmarks__/operations.bench.ts > Operations Benchmarks > ThrottledScheduler > benchmark: Enqueue 10 operations
 
-================================================================================
-OPERATIONS BENCHMARK RESULTS
-================================================================================
+ BENCH  Summary
 
-OperationMerger.merge (10 UPDATEs):
-  Mean: 0.002ms
-  Median: 0.001ms
-  Min: 0.001ms
-  Max: 0.019ms
-  Ops/sec: 657231
 
-OperationMerger.merge (100 UPDATEs):
-  Mean: 0.105ms
-  Median: 0.100ms
-  Min: 0.096ms
-  Max: 0.270ms
-  Ops/sec: 9531
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+[3Jc
+ RERUN  src/runtime/receiver.ts
 
-OperationMerger.merge (1000 mixed):
-  Mean: 0.035ms
-  Median: 0.032ms
-  Min: 0.024ms
-  Max: 0.230ms
-  Ops/sec: 28450
 
-OperationMerger.merge (no merging possible):
-  Mean: 0.004ms
-  Median: 0.004ms
-  Min: 0.003ms
-  Max: 0.096ms
-  Ops/sec: 264206
 
-ThrottledScheduler.enqueue (single):
-  Mean: 0.002ms
-  Median: 0.001ms
-  Min: 0.001ms
-  Max: 0.032ms
-  Ops/sec: 642002
+ BENCH  Summary
 
-ThrottledScheduler.enqueueAll (10):
-  Mean: 0.002ms
-  Median: 0.001ms
-  Min: 0.001ms
-  Max: 0.011ms
-  Ops/sec: 566706
 
-================================================================================
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+[3Jc
+ RERUN  src/__benchmarks__/operations.bench.ts x9
+
+
+
+ BENCH  Summary
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+       rerun x9
+[2K[1A[2K[G[3Jc
+ RERUN  src/runtime/receiver.ts
+
+
+
+ BENCH  Summary
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+[3Jc
+ RERUN  src/runtime/receiver.ts
+
+
+
+ BENCH  Summary
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+[3Jc
+ RERUN  package.json
+
+
+
+ BENCH  Summary
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+[3Jc
+ RERUN  package.json
+
+
+
+ BENCH  Summary
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+[3Jc
+ RERUN  src/runtime/receiver.ts
+
+
+
+ BENCH  Summary
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+[3Jc
+ RERUN  package.json
+
+
+
+ BENCH  Summary
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+[3Jc
+ RERUN  src/runtime/receiver.ts
+
+
+
+ BENCH  Summary
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+[3Jc
+ RERUN  package.json
+
+
+
+ BENCH  Summary
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+===================================================
 
 
 stdout | src/__benchmarks__/operations.bench.ts > Operations Benchmarks > ThrottledScheduler > benchmark: Enqueue 100 operations

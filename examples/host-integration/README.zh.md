@@ -1,10 +1,10 @@
 # 宿主集成示例
 
-本示例展示如何在 React Native 应用中完整集成 Rill 插件系统,包括:
+本示例展示如何在 React Native 应用中完整集成 Rill guest系统,包括:
 
 - ✅ Engine 实例创建和配置
 - ✅ EngineView 生命周期管理
-- ✅ 宿主与插件双向通信
+- ✅ 宿主与guest双向通信
 - ✅ 错误处理和恢复
 - ✅ 自定义组件注册
 - ✅ QuickJS Provider 配置
@@ -14,18 +14,18 @@
 ```
 host-integration/
 ├── src/
-│   ├── plugin.tsx           # 插件代码 (在沙箱中运行)
+│   ├── guest.tsx           # guest代码 (在沙箱中运行)
 │   ├── HostApp.tsx           # 宿主应用示例
 │   └── QuickJSProvider.tsx   # QuickJS Provider 配置
 ├── dist/
-│   └── plugin.js             # 构建后的插件包
+│   └── guest.js             # 构建后的guest包
 ├── package.json
 └── README.md
 ```
 
 ## 快速开始
 
-### 1. 构建插件
+### 1. 构建guest
 
 ```bash
 npm install
@@ -42,7 +42,7 @@ import { createQuickJSProvider } from './QuickJSProvider';
 
 // 创建 Engine 实例
 const engine = new Engine({
-  quickjs: createQuickJSProvider(),
+  provider: createQuickJSProvider(),
   timeout: 5000,
   debug: true,
 });
@@ -55,10 +55,10 @@ engine.register({
 // 在组件中使用
 <EngineView
   engine={engine}
-  bundleUrl="./dist/plugin.js"  // 或远程 URL
+  bundleUrl="./dist/guest.js"  // 或远程 URL
   initialProps={{ userId: '123' }}
-  onLoad={() => console.log('Plugin loaded')}
-  onError={(err) => console.error('Plugin error:', err)}
+  onLoad={() => console.log('Guest loaded')}
+  onError={(err) => console.error('Guest error:', err)}
 />
 ```
 
@@ -69,7 +69,7 @@ engine.register({
 ```tsx
 const engine = new Engine({
   // QuickJS provider (必需)
-  quickjs: createQuickJSProvider(),
+  provider: createQuickJSProvider(),
 
   // 执行超时 (毫秒)
   timeout: 5000,
@@ -96,29 +96,29 @@ const engine = new Engine({
 
 ### 2. 双向通信
 
-**宿主发送事件到插件:**
+**宿主发送事件到guest:**
 
 ```tsx
 // 在宿主代码中
 engine.sendEvent('THEME_CHANGE', { theme: 'dark' });
 ```
 
-**插件发送消息到宿主:**
+**guest发送消息到宿主:**
 
 ```tsx
-// 在插件代码中
+// 在guest代码中
 import { useSendToHost } from 'rill/sdk';
 
 const sendToHost = useSendToHost();
 sendToHost('USER_ACTION', { action: 'click', target: 'button' });
 ```
 
-**宿主监听插件消息:**
+**宿主监听guest消息:**
 
 ```tsx
 // 在宿主代码中
 engine.on('message', (message) => {
-  console.log('From plugin:', message.event, message.payload);
+  console.log('From guest:', message.event, message.payload);
 });
 ```
 
@@ -127,23 +127,23 @@ engine.on('message', (message) => {
 ```tsx
 <EngineView
   engine={engine}
-  bundleUrl={pluginUrl}
+  bundleUrl={guestUrl}
 
   // 加载完成
   onLoad={() => {
-    console.log('Plugin ready');
+    console.log('Guest ready');
     engine.sendEvent('INIT', { config });
   }}
 
   // 错误处理
   onError={(error) => {
-    console.error('Plugin error:', error);
+    console.error('Guest error:', error);
     // 上报错误、显示降级 UI 等
   }}
 
   // 销毁回调
   onDestroy={() => {
-    console.log('Plugin destroyed');
+    console.log('Guest destroyed');
     // 清理资源
   }}
 
@@ -157,7 +157,7 @@ engine.on('message', (message) => {
 
 ### 4. 自定义组件注册
 
-将原生组件暴露给插件:
+将原生组件暴露给guest:
 
 ```tsx
 import { requireNativeComponent } from 'react-native';
@@ -171,13 +171,13 @@ engine.register({
 });
 ```
 
-在插件中使用:
+在guest中使用:
 
 ```tsx
 import { View } from 'rill/sdk';
 
 // 自动获取注册的组件
-function Plugin() {
+function Guest() {
   return <MapView region={...} />;
 }
 ```
@@ -206,7 +206,7 @@ engine.on('error', (error) => {
 ### 1. 错误边界
 
 ```tsx
-class PluginErrorBoundary extends React.Component {
+class GuestErrorBoundary extends React.Component {
   state = { hasError: false };
 
   static getDerivedStateFromError(error) {
@@ -214,7 +214,7 @@ class PluginErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, info) {
-    console.error('Plugin error:', error, info);
+    console.error('Guest error:', error, info);
   }
 
   render() {
@@ -226,21 +226,21 @@ class PluginErrorBoundary extends React.Component {
 }
 
 // 使用
-<PluginErrorBoundary>
+<GuestErrorBoundary>
   <EngineView engine={engine} bundleUrl={url} />
-</PluginErrorBoundary>
+</GuestErrorBoundary>
 ```
 
-### 2. 动态插件加载
+### 2. 动态guest加载
 
 ```tsx
-function DynamicPlugin({ pluginId }) {
+function DynamicGuest({ guestId }) {
   const [bundleUrl, setBundleUrl] = useState(null);
 
   useEffect(() => {
-    // 从服务器获取插件 URL
-    fetchPluginUrl(pluginId).then(setBundleUrl);
-  }, [pluginId]);
+    // 从服务器获取guest URL
+    fetchGuestUrl(guestId).then(setBundleUrl);
+  }, [guestId]);
 
   if (!bundleUrl) return <Loader />;
 
@@ -261,7 +261,7 @@ function DynamicPlugin({ pluginId }) {
 
 ```tsx
 useEffect(() => {
-  const engine = new Engine({ quickjs });
+  const engine = new Engine({ provider });
 
   return () => {
     // 组件卸载时销毁 engine
@@ -307,4 +307,4 @@ setInterval(() => {
 
 - [Engine API](../../docs/api/engine.md)
 - [EngineView API](../../docs/api/engine-view.md)
-- [插件开发指南](../../docs/guides/plugin-development.md)
+- [guest开发指南](../../docs/guides/guest-development.md)

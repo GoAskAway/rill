@@ -1,5 +1,5 @@
 /**
- * Advanced Features Demo Plugin
+ * Advanced Features Demo Guest
  */
 
 import React, { useState, useEffect } from 'react';
@@ -11,15 +11,15 @@ import {
   ActivityIndicator,
 } from 'rill/sdk';
 
-export default function Plugin() {
+export default function Guest() {
   const [workload, setWorkload] = useState<'light' | 'heavy' | 'infinite'>('light');
   const [renderCount, setRenderCount] = useState(0);
   const [computeResult, setComputeResult] = useState<number | null>(null);
 
-  // Re-render count
+  // Track initial render (only once)
   useEffect(() => {
     setRenderCount((c) => c + 1);
-  });
+  }, []);
 
   // Lightweight computation
   const handleLightCompute = () => {
