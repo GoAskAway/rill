@@ -34,7 +34,7 @@
     "test:watch": "bun test --watch",
     "test:coverage": "bun test --coverage",
     "test:coverage:check": "node scripts/check-coverage.cjs",
-    "bench": "bun test --run src/__benchmarks__/*.bench.ts",
+    "bench": "bun test --run ./src/__benchmarks__/*.bench.ts",
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
     "typecheck": "tsc --noEmit -p tsconfig.check.json"
