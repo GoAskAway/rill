@@ -23,9 +23,7 @@ export interface BenchmarkOptions {
 /**
  * Measure execution time of a function
  */
-export async function measure(
-  fn: () => void | Promise<void>
-): Promise<number> {
+export async function measure(fn: () => void | Promise<void>): Promise<number> {
   const start = performance.now();
   await fn();
   const end = performance.now();
@@ -40,12 +38,7 @@ export async function benchmark(
   fn: () => void | Promise<void>,
   options: BenchmarkOptions = {}
 ): Promise<BenchmarkResult> {
-  const {
-    iterations = 100,
-    warmup = 10,
-    minSamples = 50,
-    maxTime = 10000,
-  } = options;
+  const { iterations = 100, warmup = 10, minSamples = 50, maxTime = 10000 } = options;
 
   // Warmup phase
   for (let i = 0; i < warmup; i++) {
@@ -61,10 +54,7 @@ export async function benchmark(
     samples.push(time);
 
     // Stop if we've collected enough samples or exceeded max time
-    if (
-      samples.length >= minSamples &&
-      performance.now() - startTime > maxTime
-    ) {
+    if (samples.length >= minSamples && performance.now() - startTime > maxTime) {
       break;
     }
   }
@@ -77,9 +67,7 @@ export async function benchmark(
   const max = sorted[sorted.length - 1] ?? 0;
 
   // Calculate standard deviation
-  const variance =
-    samples.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
-    samples.length;
+  const variance = samples.reduce((sum, val) => sum + (val - mean) ** 2, 0) / samples.length;
   const stdDev = Math.sqrt(variance);
 
   // Operations per second

@@ -1,5 +1,11 @@
-import { describe, it, expect, mock } from 'bun:test';
-import { RNQuickJSProvider, resolveRNQuickJS, type RNQuickJSLike, type RNQuickJSRuntime, type RNQuickJSContext } from './RNQuickJSProvider';
+import { describe, expect, it, mock } from 'bun:test';
+import {
+  type RNQuickJSContext,
+  type RNQuickJSLike,
+  RNQuickJSProvider,
+  type RNQuickJSRuntime,
+  resolveRNQuickJS,
+} from './RNQuickJSProvider';
 
 // ============ Mock RNQuickJS Implementation ============
 
@@ -37,7 +43,7 @@ class MockRNQuickJSContext implements RNQuickJSContext {
     this.globals.clear();
   }
 
-  setInterruptHandler(handler: () => boolean): void {
+  setInterruptHandler(_handler: () => boolean): void {
     // Mock implementation
   }
 
@@ -60,21 +66,21 @@ class MockRNQuickJSRuntime implements RNQuickJSRuntime {
     this.disposed = true;
   }
 
-  setTimeout(ms: number): void {
+  setTimeout(_ms: number): void {
     // Mock implementation
   }
 
-  setMemoryLimit(bytes: number): void {
+  setMemoryLimit(_bytes: number): void {
     // Mock implementation
   }
 
-  setMaxStackSize(size: number): void {
+  setMaxStackSize(_size: number): void {
     // Mock implementation
   }
 }
 
 class MockRNQuickJS implements RNQuickJSLike {
-  createRuntime(options?: { timeout?: number; memoryLimit?: number }): RNQuickJSRuntime {
+  createRuntime(_options?: { timeout?: number; memoryLimit?: number }): RNQuickJSRuntime {
     return new MockRNQuickJSRuntime();
   }
 }
@@ -116,7 +122,7 @@ describe('RNQuickJSProvider', () => {
   });
 
   it('should pass memory limit option to runtime', () => {
-    const createRuntimeSpy = mock((options) => new MockRNQuickJSRuntime());
+    const createRuntimeSpy = mock((_options) => new MockRNQuickJSRuntime());
     const mockQuickJS = { createRuntime: createRuntimeSpy };
 
     const provider = new RNQuickJSProvider(mockQuickJS, { memoryLimit: 1024 * 1024 });

@@ -1,4 +1,4 @@
-import { describe, it, expect, mock } from 'bun:test';
+import { describe, expect, it } from 'bun:test';
 import { WorkerJSEngineProvider } from './WorkerJSEngineProvider';
 
 // Mock Worker implementation
@@ -114,9 +114,11 @@ describe('WorkerJSEngineProvider', () => {
     context.setGlobal('name', 'value');
 
     // Check that messages were sent
-    expect(trackingWorker['messageQueue'].some((msg: any) =>
-      msg.type === 'setGlobal' && msg.name === 'test' && msg.value === 123
-    )).toBe(true);
+    expect(
+      trackingWorker.messageQueue.some(
+        (msg: any) => msg.type === 'setGlobal' && msg.name === 'test' && msg.value === 123
+      )
+    ).toBe(true);
   });
 
   it('should skip functions in setGlobal', async () => {
@@ -129,8 +131,8 @@ describe('WorkerJSEngineProvider', () => {
     context.setGlobal('func', () => {});
 
     // Should not have setGlobal message for function
-    const funcMessages = trackingWorker['messageQueue'].filter((msg: any) =>
-      msg.type === 'setGlobal' && msg.name === 'func'
+    const funcMessages = trackingWorker.messageQueue.filter(
+      (msg: any) => msg.type === 'setGlobal' && msg.name === 'func'
     );
     expect(funcMessages.length).toBe(0);
   });
@@ -144,8 +146,8 @@ describe('WorkerJSEngineProvider', () => {
     // Should skip objects with functions
     context.setGlobal('console', { log: () => {} });
 
-    const consoleMessages = trackingWorker['messageQueue'].filter((msg: any) =>
-      msg.type === 'setGlobal' && msg.name === 'console'
+    const consoleMessages = trackingWorker.messageQueue.filter(
+      (msg: any) => msg.type === 'setGlobal' && msg.name === 'console'
     );
     expect(consoleMessages.length).toBe(0);
   });

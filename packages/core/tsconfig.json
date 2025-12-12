@@ -35,8 +35,10 @@
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "paths": {
-      "rill/sdk": ["./src/sdk"],
-      "rill/*": ["./src/*"]
+      "@rill/core": ["./src/runtime/index.ts"],
+      "@rill/core/sdk": ["./src/sdk/index.ts"],
+      "@rill/core/types": ["./src/types.ts"],
+      "@rill/core/devtools": ["./src/devtools/index.ts"]
     }
   },
   "include": ["src/**/*"],

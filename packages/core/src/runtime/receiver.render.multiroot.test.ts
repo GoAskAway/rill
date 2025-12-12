@@ -1,7 +1,7 @@
-import { describe, it, expect, mock } from 'bun:test';
+import { describe, expect, it, mock } from 'bun:test';
+import React from 'react';
 import { Receiver } from './receiver';
 import { createRegistry } from './registry';
-import React from 'react';
 
 describe('Receiver render metrics - multi root & text nodes', () => {
   it('reports metrics for multi-root including text node', () => {
@@ -9,7 +9,12 @@ describe('Receiver render metrics - multi root & text nodes', () => {
     const onMetric = mock();
     const Dummy = (props: any) => React.createElement('div', props, props.children);
     registry.register('View', Dummy as any);
-    const receiver = new Receiver(registry, () => {}, () => {}, { onMetric });
+    const receiver = new Receiver(
+      registry,
+      () => {},
+      () => {},
+      { onMetric }
+    );
 
     const ops: any[] = [];
     // text node id: 100
@@ -26,7 +31,7 @@ describe('Receiver render metrics - multi root & text nodes', () => {
     const el = receiver.render();
     expect(el).not.toBeNull();
 
-    const names = onMetric.mock.calls.map(c => c[0]);
+    const names = onMetric.mock.calls.map((c) => c[0]);
     expect(names).toContain('receiver.render');
   });
 });

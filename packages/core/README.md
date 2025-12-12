@@ -10,7 +10,7 @@ Lightweight, headless, sandboxed React Native dynamic UI rendering engine.
 - **Complete Sandbox Isolation**: Multiple sandbox modes (vm, worker) - guest crashes don't affect the host
 - **Lightweight and Efficient**: No WebView overhead, native rendering performance
 - **Flexible Extension**: Supports registering custom business components
-- **Multi-tenant Support**: `PooledEngine` for resource sharing and fault isolation
+- **Dedicated Runtime**: Each Engine owns an isolated JS runtime/thread for maximum stability
 
 ## Quick Start
 
@@ -93,7 +93,7 @@ export default function MyBundle() {
 
 ```bash
 # Install CLI
-bun add -g @anthropic/rill-cli
+bun add -g @rill/cli
 
 # Build
 rill build src/bundle.tsx -o dist/bundle.js
@@ -188,54 +188,80 @@ rill build src/bundle.tsx --watch --no-minify --sourcemap
 
 ### Engine (Standalone)
 
-Each engine has its own dedicated JS sandbox - suitable for single-tenant scenarios.
+Each Engine instance creates its own dedicated JS sandbox. Create a new Engine for each isolated context needed (e.g., each tab/view).
 
 ```typescript
-const engine = new Engine({ sandbox: 'vm' });
+// Create engine with specific sandbox mode
+const engine = new Engine({ sandbox: 'vm', debug: true });
+
+// Register components and load bundle
+engine.register({ CustomComponent });
+await engine.loadBundle(bundleCode);
+
+// When done, destroy to release resources
+engine.destroy();
 ```
 
-### PooledEngine (Multi-tenant)
+**Resource Management** (Critical in Dedicated Engine Architecture):
+- Each Engine owns an isolated JS runtime/thread - forgotten `destroy()` calls = permanent memory/thread leaks
+- **Always** call `engine.destroy()` when the Tab/View is closed
+- In React: Use `useEffect` cleanup to ensure destroy is called
+- Monitor with `engine.getResourceStats()`: `{ timers, nodes, callbacks }`
 
-Multiple engines share a worker pool - suitable for multi-tenant scenarios with resource limits and fault isolation.
-
+**Lifecycle Best Practices**:
 ```typescript
-import { PooledEngine, createWorkerPool } from '@rill/core';
+// React component example
+function MyTabContent({ tabId, bundleUrl }) {
+  const engineRef = useRef<Engine | null>(null);
 
-// Simple usage - uses global pool
-const engine = new PooledEngine();
+  useEffect(() => {
+    // Create engine when tab mounts
+    const engine = new Engine({ debug: true });
+    engine.register(DefaultComponents);
+    engine.loadBundle(bundleUrl);
+    engineRef.current = engine;
 
-// Custom pool with limits
-const pool = createWorkerPool({ maxWorkers: 4 });
-const engine = new PooledEngine({ pool });
+    // CRITICAL: Cleanup when tab unmounts
+    return () => {
+      engine.destroy();
+      engineRef.current = null;
+    };
+  }, [bundleUrl]);
+
+  return <EngineView engine={engineRef.current} />;
+}
 ```
 
 ## Module Description
 
 | Module | Path | Description |
 |--------|------|-------------|
-| SDK | `rill/sdk` | Guest development kit, virtual components and Hooks |
-| Runtime | `rill` | Host runtime, Engine/PooledEngine and EngineView |
-| CLI | `@anthropic/rill-cli` | Bundle compiler tool |
+| SDK | `@rill/core/sdk` | Guest development kit, virtual components and Hooks |
+| Runtime | `@rill/core` | Host runtime, Engine and EngineView |
+| CLI | `@rill/cli` | Bundle compiler tool |
 
 ## API
 
 ### Engine
 
 ```typescript
-import { Engine, PooledEngine } from '@rill/core';
+import { Engine } from '@rill/core';
 
-// Standalone engine
 const engine = new Engine(options?: EngineOptions);
-
-// Pooled engine (multi-tenant)
-const pooledEngine = new PooledEngine(options?: PooledEngineOptions);
 
 interface EngineOptions {
   sandbox?: 'vm' | 'worker' | 'none';  // Sandbox mode (auto-detected if not set)
   provider?: JSEngineProvider;          // Custom provider
   timeout?: number;                     // Execution timeout (default 5000ms)
   debug?: boolean;                      // Debug mode
-  logger?: Logger;                      // Custom logger
+  logger?: {                            // Custom logger
+    log: (...args: unknown[]) => void;
+    warn: (...args: unknown[]) => void;
+    error: (...args: unknown[]) => void;
+  };
+  onMetric?: (name: string, value: number, extra?: Record<string, unknown>) => void;  // Performance metrics callback
+  requireWhitelist?: string[];          // Allowed require() modules
+  receiverMaxBatchSize?: number;        // Max operations per batch (default 5000) - Critical for Host UI protection
 }
 
 // Register components
@@ -250,7 +276,29 @@ engine.sendEvent('EVENT_NAME', payload);
 // Update configuration
 engine.updateConfig({ key: value });
 
-// Destroy
+// Monitor resources
+const stats = engine.getResourceStats();
+console.log(`Timers: ${stats.timers}, Nodes: ${stats.nodes}, Callbacks: ${stats.callbacks}`);
+
+// Get unique engine ID
+console.log(`Engine ID: ${engine.id}`);
+
+// Health check
+const health = engine.getHealth();
+
+// Subscribe to engine events
+engine.on('load', () => console.log('Bundle loaded'));
+engine.on('error', (error: Error) => console.error('Guest error:', error));
+engine.on('fatalError', (error: Error) => console.error('Fatal error:', error)); // Engine auto-destroyed after this
+engine.on('destroy', () => console.log('Engine destroyed'));
+engine.on('operation', (batch: OperationBatch) => { /* ... */ });
+engine.on('message', (message: GuestMessage) => { /* ... */ });
+
+// Memory leak detection (for Host event listeners)
+engine.setMaxListeners(20);  // Increase listener threshold
+const limit = engine.getMaxListeners();
+
+// Destroy (releases all resources: timers, nodes, callbacks, runtime)
 engine.destroy();
 ```
 
@@ -277,6 +325,31 @@ send('EVENT_NAME', payload);
 - `Image` - Image component
 - `ScrollView` - Scroll container
 - `TouchableOpacity` - Touchable component
+- `TextInput` - Text input with state management
+- `FlatList` - Virtualized list for performance
+- `Button` - Button component
+- `Switch` - Toggle switch
+- `ActivityIndicator` - Loading spinner
+
+### Error Boundary
+
+```typescript
+import { RillErrorBoundary } from '@rill/core/sdk';
+
+function App() {
+  return (
+    <RillErrorBoundary
+      fallback={<Text>Something went wrong</Text>}
+      onError={(error, info) => {
+        // Error info includes componentStack
+        sendToHost('RENDER_ERROR', { message: error.message });
+      }}
+    >
+      <MyComponent />
+    </RillErrorBoundary>
+  );
+}
+```
 
 ## Performance Optimization
 
@@ -287,7 +360,7 @@ import {
   ThrottledScheduler,
   VirtualScrollCalculator,
   PerformanceMonitor
-} from 'rill/runtime';
+} from '@rill/core';
 
 // Batch update throttling
 const scheduler = new ThrottledScheduler(onBatch, {
@@ -306,19 +379,28 @@ const calculator = new VirtualScrollCalculator({
 const monitor = new PerformanceMonitor();
 ```
 
-## Debugging Tools
+## Debugging
+
+Use the built-in resource monitoring and event tracking:
 
 ```tsx
-import { createDevTools } from 'rill/devtools';
+// Monitor resource usage
+const stats = engine.getResourceStats();
+console.log('Resources:', stats);
 
-const devtools = createDevTools();
-devtools.enable();
+// Track errors
+engine.on('error', (error: Error) => {
+  console.error('[Guest Error]', error);
+});
 
-// View component tree
-console.log(devtools.getComponentTreeText(nodeMap, rootChildren));
+engine.on('fatalError', (error: Error) => {
+  console.error('[Fatal Error - Engine destroyed]', error);
+});
 
-// Export debug data
-const data = devtools.exportAll();
+// Monitor operations
+engine.on('operation', (batch) => {
+  console.log(`Operations: ${batch.operations.length}`);
+});
 ```
 
 ## Documentation

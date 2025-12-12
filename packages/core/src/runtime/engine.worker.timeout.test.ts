@@ -1,12 +1,13 @@
-import { describe, it, expect } from 'bun:test';
+import { describe, expect, it } from 'bun:test';
 import { Engine } from './engine';
 import { WorkerJSEngineProvider } from './WorkerJSEngineProvider';
 
 describe('WorkerJSEngineProvider', () => {
   it.skipIf(typeof Worker === 'undefined')('should interrupt long-running code', async () => {
-    const createWorker = () => new Worker(new URL('./engine.worker.ts', import.meta.url), { type: 'module' });
+    const createWorker = () =>
+      new Worker(new URL('./engine.worker.ts', import.meta.url), { type: 'module' });
     const provider = new WorkerJSEngineProvider(createWorker, { timeout: 100 });
-    
+
     const engine = new Engine({
       quickjs: provider,
       debug: false,
@@ -16,7 +17,7 @@ describe('WorkerJSEngineProvider', () => {
     let threw = false;
     try {
       await engine.loadBundle('for(;;){}');
-    } catch (e) {
+    } catch (_e) {
       threw = true;
     }
 

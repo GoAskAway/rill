@@ -1,7 +1,7 @@
-import { describe, it, expect, mock } from 'bun:test';
+import { describe, expect, it, mock } from 'bun:test';
+import React from 'react';
 import { Receiver } from './receiver';
 import { createRegistry } from './registry';
-import React from 'react';
 
 function makeTree(depth: number, breadth: number) {
   let id = 1;
@@ -26,16 +26,21 @@ describe('Receiver render metrics - complex tree', () => {
     const Dummy = (props: any) => React.createElement('div', props, props.children);
     registry.register('View', Dummy as any);
     const onMetric = mock();
-    const receiver = new Receiver(registry, () => {}, () => {}, { onMetric });
+    const receiver = new Receiver(
+      registry,
+      () => {},
+      () => {},
+      { onMetric }
+    );
 
     const batch = makeTree(3, 3); // 1 + 3 + 9 + 27 nodes total created, but appended subset; depends on ops
     receiver.applyBatch(batch);
     receiver.render();
 
-    const names = onMetric.mock.calls.map(c => c[0]);
+    const names = onMetric.mock.calls.map((c) => c[0]);
     expect(names).toContain('receiver.render');
 
-    const last = onMetric.mock.calls.reverse().find(c => c[0] === 'receiver.render');
+    const last = onMetric.mock.calls.reverse().find((c) => c[0] === 'receiver.render');
     const extra = last?.[2] as any;
     expect(typeof extra.nodeCount).toBe('number');
     expect(extra.nodeCount).toBeGreaterThan(0);

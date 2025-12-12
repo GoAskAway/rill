@@ -37,7 +37,7 @@
   "dependencies": {
     "commander": "^11.0.0",
     "oxc-parser": "^0.101.0",
-    "@rill/core": "*",
+    "@rill/core": "workspace:*",
     "vite": "^6.0.0"
   },
   "devDependencies": {

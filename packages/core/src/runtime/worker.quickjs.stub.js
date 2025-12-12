@@ -21,7 +21,7 @@ self.onmessage = async (ev) => {
         // TODO: eval code in QuickJS context
         postMessage({ type: 'result', id: msg.id, result: null });
       } catch (e) {
-        postMessage({ type: 'error', id: msg.id, error: String(e && e.message || e) });
+        postMessage({ type: 'error', id: msg.id, error: String(e?.message || e) });
       }
       break;
     case 'dispose':

@@ -8,14 +8,14 @@
  * - Update performance
  */
 
-import { describe, it, beforeEach, afterEach } from 'vitest';
 import React from 'react';
-import { ComponentRegistry } from '../runtime/registry';
+import { afterEach, beforeEach, describe, it } from 'vitest';
 import { Receiver } from '../runtime/receiver';
-import { benchmark } from './utils/benchmark';
-import { measureMemory, formatMemoryMeasurement } from './utils/memory';
-import type { BenchmarkResult } from './utils/benchmark';
+import { ComponentRegistry } from '../runtime/registry';
 import type { Operation, OperationBatch } from '../types';
+import type { BenchmarkResult } from './utils/benchmark';
+import { benchmark } from './utils/benchmark';
+import { formatMemoryMeasurement, measureMemory } from './utils/memory';
 
 // Mock components
 const MockView: React.FC<{ children?: React.ReactNode }> = ({ children }) =>
@@ -58,7 +58,7 @@ describe('Receiver Benchmarks', () => {
 
   afterEach(() => {
     if (results.length > 0) {
-      console.log('\n' + '='.repeat(80));
+      console.log(`\n${'='.repeat(80)}`);
       console.log('RECEIVER BENCHMARK RESULTS');
       console.log('='.repeat(80));
       results.forEach((result) => {
@@ -69,7 +69,7 @@ describe('Receiver Benchmarks', () => {
         console.log(`  Max: ${result.max.toFixed(3)}ms`);
         console.log(`  Ops/sec: ${result.ops.toFixed(0)}`);
       });
-      console.log('\n' + '='.repeat(80) + '\n');
+      console.log(`\n${'='.repeat(80)}\n`);
     }
   });
 
@@ -267,6 +267,6 @@ describe('Receiver Benchmarks', () => {
       receiver.applyBatch(createBatch(operations));
     });
 
-    console.log('\n' + formatMemoryMeasurement(measurement));
+    console.log(`\n${formatMemoryMeasurement(measurement)}`);
   });
 });

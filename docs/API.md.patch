@@ -1,0 +1,87 @@
+# API.md 修正清单
+
+## 需要修正的内容
+
+### 1. Runtime 章节标题和导入路径
+- Line 296: `## Runtime (rill/runtime)` → `## Runtime (@rill/core)`
+- Line 305: `import { Engine } from 'rill/runtime';` → `import { Engine } from '@rill/core';`
+- Line 371: `import { EngineView } from 'rill/runtime';` → `import { EngineView } from '@rill/core';`
+
+### 2. Engine Constructor Options (Line 341-347)
+需要添加缺失的选项：
+- sandbox?: 'vm' | 'worker' | 'none'
+- provider?: JSEngineProvider
+- requireWhitelist?: string[]
+- onMetric?: (name: string, value: number, extra?) => void
+- receiverMaxBatchSize?: number
+
+Logger 类型需要完整定义：
+```typescript
+logger?: {
+  log: (...args: unknown[]) => void;
+  warn: (...args: unknown[]) => void;
+  error: (...args: unknown[]) => void;
+}
+```
+
+### 3. Engine Methods (Line 349-357)
+需要添加缺失的方法：
+- on(event, handler): Remove listener function
+- setMaxListeners(n: number): void
+- getMaxListeners(): number
+- getHealth(): EngineHealth
+- getResourceStats(): ResourceStats
+- createReceiver(registry): Receiver
+- getReceiver(): Receiver | null
+- getRegistry(): ComponentRegistry
+
+### 4. Engine Properties (Line 359-364)
+需要添加：
+- id: string (readonly)
+- isLoaded → loaded: boolean
+- isDestroyed → destroyed: boolean
+
+### 5. EngineEvents (需要新增章节)
+```typescript
+interface EngineEvents {
+  load: () => void;
+  error: (error: Error) => void;
+  fatalError: (error: Error) => void;
+  destroy: () => void;
+  operation: (batch: OperationBatch) => void;
+  message: (message: GuestMessage) => void;
+}
+```
+
+### 6. ResourceStats Interface (需要新增)
+```typescript
+interface ResourceStats {
+  timers: number;    // setTimeout/setInterval count
+  nodes: number;     // VNode count
+  callbacks: number; // Registered callback count
+}
+```
+
+### 7. EngineView Props (Line 388-398)
+实际接口：
+- engine: Engine (Required) - 不是 source
+- bundleUrl?: string
+- initialProps?: object
+- onLoad?: () => void
+- onError?: (error: Error) => void
+- onDestroy?: () => void
+- renderError?: (error: Error) => React.ReactElement
+- style?: StyleProp
+- 删除：source, components, fallback, debug
+
+### 8. Type Definitions 章节
+需要添加完整的类型定义：
+- EngineOptions
+- EngineEvents
+- ResourceStats
+- EngineHealth
+- GuestMessage
+- OperationBatch
+- Operation types
+- ComponentMap
+- JSEngineProvider

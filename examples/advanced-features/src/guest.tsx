@@ -2,17 +2,11 @@
  * Advanced Features Demo Guest
  */
 
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  ActivityIndicator,
-} from '@rill/core/sdk';
+import { ScrollView, Text, TouchableOpacity, View } from '@rill/core/sdk';
+import { useEffect, useState } from 'react';
 
 export default function Guest() {
-  const [workload, setWorkload] = useState<'light' | 'heavy' | 'infinite'>('light');
+  const [_workload, _setWorkload] = useState<'light' | 'heavy' | 'infinite'>('light');
   const [renderCount, setRenderCount] = useState(0);
   const [computeResult, setComputeResult] = useState<number | null>(null);
 
@@ -85,17 +79,11 @@ export default function Guest() {
 
       {/* Status Information */}
       <View style={{ padding: 16 }}>
-        <View
-          style={{ backgroundColor: 'white', borderRadius: 12, padding: 16 }}
-        >
-          <Text style={{ fontSize: 18, fontWeight: '600', marginBottom: 12 }}>
-            Runtime Status
-          </Text>
+        <View style={{ backgroundColor: 'white', borderRadius: 12, padding: 16 }}>
+          <Text style={{ fontSize: 18, fontWeight: '600', marginBottom: 12 }}>Runtime Status</Text>
           <View style={{ gap: 8 }}>
             <Text style={{ fontSize: 14 }}>Render Count: {renderCount}</Text>
-            <Text style={{ fontSize: 14 }}>
-              Computation Result: {computeResult ?? 'N/A'}
-            </Text>
+            <Text style={{ fontSize: 14 }}>Computation Result: {computeResult ?? 'N/A'}</Text>
             <Text style={{ fontSize: 14, color: '#666', marginTop: 8 }}>
               Tip: Open the host application's console to view performance metrics
             </Text>
@@ -105,9 +93,7 @@ export default function Guest() {
 
       {/* Performance Testing */}
       <View style={{ padding: 16 }}>
-        <View
-          style={{ backgroundColor: 'white', borderRadius: 12, padding: 16 }}
-        >
+        <View style={{ backgroundColor: 'white', borderRadius: 12, padding: 16 }}>
           <Text style={{ fontSize: 18, fontWeight: '600', marginBottom: 12 }}>
             Performance Testing
           </Text>
@@ -166,9 +152,7 @@ export default function Guest() {
 
       {/* Batch Processing Test */}
       <View style={{ padding: 16 }}>
-        <View
-          style={{ backgroundColor: 'white', borderRadius: 12, padding: 16 }}
-        >
+        <View style={{ backgroundColor: 'white', borderRadius: 12, padding: 16 }}>
           <Text style={{ fontSize: 18, fontWeight: '600', marginBottom: 12 }}>
             Batch Processing Test
           </Text>
@@ -195,25 +179,21 @@ export default function Guest() {
 
       {/* Monitoring Metrics Description */}
       <View style={{ padding: 16 }}>
-        <View
-          style={{ backgroundColor: 'white', borderRadius: 12, padding: 16 }}
-        >
+        <View style={{ backgroundColor: 'white', borderRadius: 12, padding: 16 }}>
           <Text style={{ fontSize: 18, fontWeight: '600', marginBottom: 12 }}>
             Monitoring Metrics Description
           </Text>
           <View style={{ gap: 8 }}>
             <Text style={{ fontSize: 14 }}>
-              • <Text style={{ fontWeight: '600' }}>engine.sendToSandbox</Text> -
-              Message passing time
+              • <Text style={{ fontWeight: '600' }}>engine.sendToSandbox</Text> - Message passing
+              time
             </Text>
             <Text style={{ fontSize: 14 }}>
-              • <Text style={{ fontWeight: '600' }}>receiver.render</Text> -
-              Render operation time
+              • <Text style={{ fontWeight: '600' }}>receiver.render</Text> - Render operation time
             </Text>
             <Text style={{ fontSize: 14 }}>
-              •{' '}
-              <Text style={{ fontWeight: '600' }}>receiver.applyOperations</Text>{' '}
-              - Operation application time
+              • <Text style={{ fontWeight: '600' }}>receiver.applyOperations</Text> - Operation
+              application time
             </Text>
             <Text style={{ fontSize: 14, color: '#666', marginTop: 8 }}>
               Monitor these metrics to optimize performance and identify bottlenecks
@@ -237,7 +217,9 @@ export default function Guest() {
             ⚠️ Timeout Protection
           </Text>
           <Text style={{ fontSize: 14, color: '#856404' }}>
-            If computation time exceeds the configured timeout limit, the engine will attempt to interrupt execution. This is a best-effort protection mechanism and may not fully prevent synchronous infinite loops.
+            If computation time exceeds the configured timeout limit, the engine will attempt to
+            interrupt execution. This is a best-effort protection mechanism and may not fully
+            prevent synchronous infinite loops.
           </Text>
         </View>
       </View>

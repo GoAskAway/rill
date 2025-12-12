@@ -7,16 +7,21 @@ Rill is a lightweight React Native dynamic UI rendering engine that allows runni
 ## Module Structure
 
 ```
-rill/
-├── sdk          # Guest-side SDK (runs in sandbox)
-├── runtime      # Host-side runtime
-├── reconciler   # React reconciler
-└── devtools     # Debugging tools
+@rill/core/
+├── (default export)  # Host-side runtime (Engine, EngineView, etc.)
+├── sdk               # Guest-side SDK (runs in sandbox)
+└── types             # TypeScript type definitions
 ```
+
+**Package Exports**:
+- `@rill/core` - Host runtime (Engine, EngineView, Receiver, Performance utils, etc.)
+- `@rill/core/sdk` - Guest SDK (Virtual components, Hooks, Error boundary)
+- `@rill/core/types` - Type definitions
+- `@rill/cli` - CLI tools for building bundles
 
 ---
 
-## SDK (rill/sdk)
+## SDK (@rill/core/sdk)
 
 SDK used by guest developers, runs in the QuickJS sandbox.
 
@@ -288,16 +293,16 @@ function Guest() {
 
 ---
 
-## Runtime (rill/runtime)
+## Runtime (@rill/core)
 
 Host-side runtime, responsible for sandbox execution and UI rendering.
 
 ### Engine
 
-Sandbox engine, manages QuickJS execution environment.
+Sandbox engine, manages JS sandbox execution environment.
 
 ```tsx
-import { Engine } from 'rill/runtime';
+import { Engine } from '@rill/core';
 
 const engine = new Engine({
   timeout: 5000,
@@ -320,7 +325,9 @@ await engine.loadBundle('https://cdn.example.com/guest.js', {
 // Listen to events
 engine.on('load', () => console.log('Guest loaded'));
 engine.on('error', (error) => console.error('Guest error:', error));
+engine.on('fatalError', (error) => console.error('Fatal error - engine destroyed:', error));
 engine.on('operation', (batch) => console.log('Operations:', batch));
+engine.on('message', (msg) => console.log('Guest message:', msg));
 engine.on('destroy', () => console.log('Guest destroyed'));
 
 // Send events to sandbox
@@ -328,6 +335,16 @@ engine.sendEvent('REFRESH', { force: true });
 
 // Update configuration
 engine.updateConfig({ theme: 'light' });
+
+// Monitor resources
+const stats = engine.getResourceStats();
+console.log(`Resources: ${stats.timers} timers, ${stats.nodes} nodes, ${stats.callbacks} callbacks`);
+
+// Health check
+const health = engine.getHealth();
+
+// Memory leak detection
+engine.setMaxListeners(20);
 
 // Destroy engine
 engine.destroy();
@@ -337,44 +354,63 @@ engine.destroy();
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
+| sandbox | 'vm' \| 'worker' \| 'none' | auto-detect | Sandbox mode |
+| provider | JSEngineProvider | auto | Custom JS engine provider |
 | timeout | number | 5000 | Execution timeout (ms) |
 | debug | boolean | false | Debug mode |
-| logger | Logger | console | Log handler |
+| logger | { log, warn, error } | console | Custom logger |
+| requireWhitelist | string[] | ['react', 'react-native', ...] | Allowed require() modules |
+| onMetric | (name, value, extra?) => void | undefined | Performance metrics callback |
+| receiverMaxBatchSize | number | 5000 | Max operations per batch |
 
 #### Methods
 
 | Method | Parameters | Return | Description |
 |--------|------------|--------|-------------|
-| register | components: ComponentMap | void | Register components |
-| loadBundle | source: string, props?: object | Promise\<void\> | Load guest |
-| sendEvent | eventName: string, payload?: unknown | void | Send event |
-| updateConfig | config: object | void | Update configuration |
-| destroy | - | void | Destroy engine |
+| register | components: ComponentMap | void | Register custom components |
+| loadBundle | source: string, props?: object | Promise\<void\> | Load and execute guest bundle |
+| sendEvent | eventName: string, payload?: unknown | void | Send event to guest |
+| updateConfig | config: object | void | Update guest configuration |
+| on | event: keyof EngineEvents, handler: Function | () => void | Subscribe to engine event, returns unsubscribe function |
+| getResourceStats | - | ResourceStats | Get resource usage statistics |
+| getHealth | - | EngineHealth | Get engine health status |
+| setMaxListeners | n: number | void | Set max event listeners threshold |
+| getMaxListeners | - | number | Get max event listeners threshold |
+| createReceiver | registry: ComponentRegistry | Receiver | Create operation receiver |
+| getReceiver | - | Receiver \| null | Get current receiver |
+| getRegistry | - | ComponentRegistry | Get component registry |
+| destroy | - | void | Destroy engine and release all resources |
 
 #### Properties
 
 | Property | Type | Description |
 |----------|------|-------------|
-| isLoaded | boolean | Whether loaded |
-| isDestroyed | boolean | Whether destroyed |
+| id | string (readonly) | Unique engine identifier |
+| loaded | boolean | Whether bundle is loaded |
+| destroyed | boolean | Whether engine is destroyed |
 
 ### EngineView
 
 React Native component for rendering engine output.
 
 ```tsx
-import { EngineView } from 'rill/runtime';
+import { EngineView } from '@rill/core';
 
 function GuestContainer() {
+  const engine = new Engine();
+  engine.register({ StepList: NativeStepList });
+
   return (
     <EngineView
-      source="https://cdn.example.com/guest.js"
+      engine={engine}
+      bundleUrl="https://cdn.example.com/bundle.js"
       initialProps={{ theme: 'dark' }}
-      components={{ CustomButton: MyButton }}
-      onLoad={() => console.log('Loaded')}
-      onError={(error) => console.error(error)}
-      fallback={<Text>Loading...</Text>}
-      debug={true}
+      onLoad={() => console.log('Bundle loaded')}
+      onError={(err) => console.error('Bundle error:', err)}
+      onDestroy={() => console.log('Engine destroyed')}
+      fallback={<ActivityIndicator />}
+      renderError={(error) => <Text>Error: {error.message}</Text>}
+      style={{ flex: 1 }}
     />
   );
 }
@@ -384,20 +420,22 @@ function GuestContainer() {
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| source | string | Yes | Bundle URL or code |
-| initialProps | object | No | Initial properties |
-| components | ComponentMap | No | Custom components |
+| engine | Engine | Yes | Engine instance |
+| bundleUrl | string | Yes | Bundle source (URL or code string) |
+| initialProps | Record<string, unknown> | No | Initial props to pass to the Guest |
 | onLoad | () => void | No | Load complete callback |
 | onError | (error: Error) => void | No | Error callback |
-| fallback | ReactElement | No | Loading placeholder |
-| debug | boolean | No | Debug mode |
+| onDestroy | () => void | No | Destroy callback |
+| fallback | ReactNode | No | Custom loading indicator |
+| renderError | (error: Error) => ReactNode | No | Custom error display |
+| style | object | No | Container style |
 
 ### ComponentRegistry
 
 Component registry, manages component whitelist.
 
 ```tsx
-import { ComponentRegistry, createRegistry } from 'rill/runtime';
+import { ComponentRegistry, createRegistry } from '@rill/core';
 
 // Use factory function
 const registry = createRegistry({
@@ -422,7 +460,7 @@ const allNames = registry.getAll();
 Operation receiver, parses operations and builds component tree.
 
 ```tsx
-import { Receiver } from 'rill/runtime';
+import { Receiver } from '@rill/core';
 
 const receiver = new Receiver(
   registry,
@@ -451,7 +489,7 @@ Performance optimization tools.
 Throttled scheduler, controls update frequency.
 
 ```tsx
-import { ThrottledScheduler } from 'rill/runtime';
+import { ThrottledScheduler } from '@rill/core';
 
 const scheduler = new ThrottledScheduler(
   (batch) => receiver.applyBatch(batch),
@@ -478,7 +516,7 @@ scheduler.dispose();
 Virtual scroll calculator, optimizes long list rendering.
 
 ```tsx
-import { VirtualScrollCalculator } from 'rill/runtime';
+import { VirtualScrollCalculator } from '@rill/core';
 
 const calculator = new VirtualScrollCalculator({
   estimatedItemHeight: 50,
@@ -498,7 +536,7 @@ const state = calculator.calculate(scrollTop, viewportHeight);
 Performance monitor.
 
 ```tsx
-import { PerformanceMonitor } from 'rill/runtime';
+import { PerformanceMonitor } from '@rill/core';
 
 const monitor = new PerformanceMonitor();
 
@@ -515,31 +553,36 @@ monitor.reset();
 
 ---
 
-## DevTools (rill/devtools)
+## DevTools (@rill/core/devtools)
 
-Debugging toolset.
+Development and debugging tools for Rill applications.
 
-### DevTools (Main Class)
+### createDevTools
 
-Integrates all debugging features.
+Create a DevTools instance with component inspection, operation logging, and timeline recording.
 
 ```tsx
-import { createDevTools } from 'rill/devtools';
+import { createDevTools } from '@rill/core/devtools';
 
 const devtools = createDevTools({
-  inspector: { maxDepth: 10, showFunctions: true },
-  maxLogs: 100,
-  maxTimelineEvents: 500,
+  inspector: {
+    maxDepth: 10,           // Max component tree depth
+    filterProps: ['style'], // Hide sensitive props
+    showFunctions: false,   // Show function props
+    highlightChanges: true, // Highlight changed nodes
+  },
+  maxLogs: 100,            // Max operation logs
+  maxTimelineEvents: 500,  // Max timeline events
 });
 
-// Enable/Disable
+// Enable/disable
 devtools.enable();
 devtools.disable();
 
-// Record events
-devtools.onBatch(batch, duration);
-devtools.onCallback(fnId, args);
-devtools.onHostEvent(eventName, payload);
+// Handle engine events
+engine.on('operation', (batch) => {
+  devtools.onBatch(batch);
+});
 
 // Get component tree
 const tree = devtools.getComponentTree(nodeMap, rootChildren);
@@ -548,16 +591,16 @@ const treeText = devtools.getComponentTreeText(nodeMap, rootChildren);
 // Export debug data
 const data = devtools.exportAll();
 
-// Reset
+// Reset all data
 devtools.reset();
 ```
 
 ### ComponentInspector
 
-Component tree inspector.
+Inspect and visualize component tree structure.
 
 ```tsx
-import { ComponentInspector } from 'rill/devtools';
+import { ComponentInspector } from '@rill/core/devtools';
 
 const inspector = new ComponentInspector({
   maxDepth: 10,
@@ -566,44 +609,55 @@ const inspector = new ComponentInspector({
   highlightChanges: true,
 });
 
+// Build tree from node map
 const tree = inspector.buildTree(nodeMap, rootChildren);
-const text = inspector.toText(tree);
-const json = inspector.toJSON(tree);
 
+// Get text representation
+const text = inspector.toText(tree);
+console.log(text);
+// └─ <View flex={1}>
+//    ├─ <Text>Hello</Text>
+//    └─ <Button title="Click">
+
+// Record changes
 inspector.recordChange(nodeId);
 inspector.clearHighlights();
 ```
 
 ### OperationLogger
 
-Operation log recorder.
+Log and analyze operations.
 
 ```tsx
-import { OperationLogger } from 'rill/devtools';
+import { OperationLogger } from '@rill/core/devtools';
 
-const logger = new OperationLogger(100);
+const logger = new OperationLogger(100); // Keep last 100 logs
 
+// Log batch
 logger.log(batch, duration);
 
+// Query logs
 const logs = logger.getLogs();
 const recent = logger.getRecentLogs(10);
 const creates = logger.filterByType('CREATE');
 const nodeOps = logger.filterByNodeId(1);
 const stats = logger.getStats();
 
-logger.clear();
+// Export/clear
 const exported = logger.export();
+logger.clear();
 ```
 
 ### TimelineRecorder
 
-Timeline recorder.
+Record timeline events for performance analysis.
 
 ```tsx
-import { TimelineRecorder } from 'rill/devtools';
+import { TimelineRecorder } from '@rill/core/devtools';
 
-const timeline = new TimelineRecorder(500);
+const timeline = new TimelineRecorder(500); // Keep last 500 events
 
+// Record events
 timeline.recordMount(nodeId, type);
 timeline.recordUpdate(nodeId, changedProps);
 timeline.recordUnmount(nodeId);
@@ -611,50 +665,52 @@ timeline.recordBatch(batchId, count, duration);
 timeline.recordCallback(fnId, args);
 timeline.recordHostEvent(eventName, payload);
 
+// Query events
 const events = timeline.getEvents();
-const rangeEvents = timeline.getEventsInRange(0, 1000);
+const rangeEvents = timeline.getEventsInRange(startTime, endTime);
 const mounts = timeline.getEventsByType('mount');
 
-timeline.reset();
+// Export/reset
 const exported = timeline.export();
+timeline.reset();
 ```
 
 ---
 
-## CLI (rill/cli)
+## CLI (@rill/cli)
 
-Command-line tool for building guests.
+Command-line tool for building guest bundles.
+
+### Installation
+
+```bash
+# Install globally
+bun add -g @rill/cli
+
+# Or use in monorepo workspace
+bun add @rill/cli --dev
+```
 
 ### Build Command
 
 ```bash
-# Build guest
-bunx rill build src/guest.tsx -o dist/bundle.js
+# Build guest bundle
+rill build src/guest.tsx -o dist/bundle.js
 
-# Watch mode
-bunx rill build src/guest.tsx -o dist/bundle.js --watch
+# Watch mode for development
+rill build src/guest.tsx --watch --no-minify --sourcemap
 
-# Generate sourcemap
-bunx rill build src/guest.tsx -o dist/bundle.js --sourcemap
+# Production build
+rill build src/guest.tsx -o dist/bundle.js --minify
 
-# No minification
-bunx rill build src/guest.tsx -o dist/bundle.js --no-minify
-
-# Generate metafile
-bunx rill build src/guest.tsx -o dist/bundle.js --metafile dist/meta.json
-```
-
-### Analyze Command
-
-```bash
-# Analyze bundle
-bunx rill analyze dist/bundle.js
+# Generate metafile for analysis
+rill build src/guest.tsx -o dist/bundle.js --metafile dist/meta.json
 ```
 
 ### Programmatic Interface
 
 ```tsx
-import { build, analyze } from 'rill/cli';
+import { build } from '@rill/cli';
 
 await build({
   entry: 'src/guest.tsx',
@@ -664,8 +720,6 @@ await build({
   watch: false,
   metafile: 'dist/meta.json',
 });
-
-await analyze('dist/bundle.js');
 ```
 
 ---
@@ -857,10 +911,20 @@ const calculator = new VirtualScrollCalculator({
 ### 3. Debugging
 
 ```tsx
-// Enable DevTools in development
-if (__DEV__) {
-  const devtools = createDevTools();
-  devtools.enable();
+// Monitor engine events
+engine.on('error', (error) => {
+  console.error('[Guest Error]', error);
+  reportError(error);
+});
+
+engine.on('operation', (batch) => {
+  console.log(`Operations: ${batch.operations.length}`);
+});
+
+// Check resource usage
+const stats = engine.getResourceStats();
+if (stats.callbacks > 1000) {
+  console.warn('High callback count detected:', stats);
 }
 ```
 
@@ -868,10 +932,148 @@ if (__DEV__) {
 
 ```tsx
 <EngineView
-  source={bundleUrl}
+  engine={engine}
+  bundleUrl={bundleUrl}
   onError={(error) => {
     reportError(error);
   }}
-  fallback={<ErrorFallback />}
+  renderError={(error) => <ErrorFallback error={error} />}
 />
+```
+
+---
+
+## Type Definitions
+
+### EngineOptions
+
+```typescript
+interface EngineOptions {
+  sandbox?: 'vm' | 'worker' | 'none';  // Sandbox mode (auto-detected if not set)
+  provider?: JSEngineProvider;          // Custom provider
+  timeout?: number;                     // Execution timeout (default 5000ms)
+  debug?: boolean;                      // Debug mode
+  logger?: {                            // Custom logger
+    log: (...args: unknown[]) => void;
+    warn: (...args: unknown[]) => void;
+    error: (...args: unknown[]) => void;
+  };
+  onMetric?: (name: string, value: number, extra?: Record<string, unknown>) => void;
+  requireWhitelist?: string[];          // Allowed require() modules
+  receiverMaxBatchSize?: number;        // Max operations per batch (default 5000)
+}
+```
+
+### EngineEvents
+
+```typescript
+interface EngineEvents {
+  load: () => void;                      // Bundle loaded successfully
+  error: (error: Error) => void;         // Guest runtime error
+  fatalError: (error: Error) => void;    // Fatal error - engine auto-destroyed
+  destroy: () => void;                   // Engine destroyed
+  operation: (batch: OperationBatch) => void;  // Operation batch received
+  message: (message: GuestMessage) => void;    // Guest message received
+}
+```
+
+### ResourceStats
+
+```typescript
+interface ResourceStats {
+  timers: number;     // Active setTimeout/setInterval count
+  nodes: number;      // VNode count in component tree
+  callbacks: number;  // Registered callback functions count
+}
+```
+
+### EngineHealth
+
+```typescript
+interface EngineHealth {
+  loaded: boolean;         // Whether bundle is loaded
+  destroyed: boolean;      // Whether engine is destroyed
+  errorCount: number;      // Total error count
+  lastErrorAt: number | null;  // Last error timestamp
+  receiverNodes: number;   // Node count in receiver
+  batching: boolean;       // Whether batching is active
+}
+```
+
+### GuestMessage
+
+```typescript
+interface GuestMessage {
+  event: string;    // Event name
+  payload: unknown; // Event payload
+}
+```
+
+### OperationBatch
+
+```typescript
+interface OperationBatch {
+  version: number;          // Protocol version
+  batchId: number;          // Batch identifier
+  operations: Operation[];  // Array of operations
+}
+```
+
+### Operation Types
+
+```typescript
+type OperationType =
+  | 'CREATE'   // Create new node
+  | 'UPDATE'   // Update node props
+  | 'DELETE'   // Delete node
+  | 'APPEND'   // Append child
+  | 'INSERT'   // Insert child at index
+  | 'REMOVE'   // Remove child
+  | 'REORDER'  // Reorder children
+  | 'TEXT';    // Update text content
+
+interface CreateOperation {
+  op: 'CREATE';
+  id: number;
+  type: string;
+  props: SerializedProps;
+}
+
+interface UpdateOperation {
+  op: 'UPDATE';
+  id: number;
+  props: SerializedProps;
+  removedProps?: string[];
+}
+
+interface AppendOperation {
+  op: 'APPEND';
+  id: number;
+  parentId: number;
+  childId: number;
+}
+
+// ... other operation types
+```
+
+### ComponentMap
+
+```typescript
+type ComponentMap = Record<string, React.ComponentType<any>>;
+```
+
+### JSEngineProvider
+
+```typescript
+interface JSEngineProvider {
+  createEngine(): JSEngine;
+  supportsWorker?: boolean;
+}
+
+interface JSEngine {
+  evaluate(code: string): unknown;
+  set(name: string, value: unknown): void;
+  get(name: string): unknown;
+  dispose(): void;
+}
 ```

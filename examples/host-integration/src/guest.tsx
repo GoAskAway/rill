@@ -3,16 +3,16 @@
  * This code runs inside QuickJS sandbox
  */
 
-import React, { useState } from 'react';
 import {
-  View,
+  ScrollView,
   Text,
   TouchableOpacity,
-  ScrollView,
+  useConfig,
   useHostEvent,
   useSendToHost,
-  useConfig,
+  View,
 } from '@rill/core/sdk';
+import { useState } from 'react';
 
 interface Config {
   userId?: string;

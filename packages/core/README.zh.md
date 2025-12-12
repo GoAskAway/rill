@@ -10,7 +10,7 @@
 - **完全沙箱隔离**：多种沙箱模式（vm、worker）- Guest 崩溃不影响宿主
 - **轻量高效**：无 WebView 开销，原生渲染性能
 - **灵活扩展**：支持注册自定义业务组件
-- **多租户支持**：`PooledEngine` 实现资源共享与故障隔离
+- **专用运行时**：每个 Engine 拥有独立的 JS 运行时/线程，最大化稳定性
 
 ## 快速开始
 
@@ -198,25 +198,48 @@ bun packages/cli/src/index.ts build src/bundle.tsx --watch --no-minify --sourcem
 
 ### Engine（独立模式）
 
-每个 Engine 拥有独立的 JS 沙箱 - 适用于单租户场景。
+每个 Engine 实例创建独立的 JS 沙箱。为每个需要隔离的上下文（如每个 Tab/View）创建新的 Engine。
 
 ```typescript
-const engine = new Engine({ sandbox: 'vm' });
+// 创建指定沙箱模式的引擎
+const engine = new Engine({ sandbox: 'vm', debug: true });
+
+// 注册组件并加载 Bundle
+engine.register({ CustomComponent });
+await engine.loadBundle(bundleCode);
+
+// 使用完毕后销毁以释放资源
+engine.destroy();
 ```
 
-### PooledEngine（多租户模式）
+**资源管理**（专用引擎架构中的关键点）：
+- 每个 Engine 拥有独立的 JS 运行时/线程 - 忘记调用 `destroy()` = 永久性内存/线程泄漏
+- **务必**在 Tab/View 关闭时调用 `engine.destroy()`
+- React 中：使用 `useEffect` 清理函数确保 destroy 被调用
+- 使用 `engine.getResourceStats()` 监控：`{ timers, nodes, callbacks }`
 
-多个 Engine 共享 Worker 池 - 适用于多租户场景，具备资源限制和故障隔离能力。
-
+**生命周期最佳实践**：
 ```typescript
-import { PooledEngine, createWorkerPool } from '@rill/core';
+// React 组件示例
+function MyTabContent({ tabId, bundleUrl }) {
+  const engineRef = useRef<Engine | null>(null);
 
-// 简单用法 - 使用全局池
-const engine = new PooledEngine();
+  useEffect(() => {
+    // Tab 挂载时创建引擎
+    const engine = new Engine({ debug: true });
+    engine.register(DefaultComponents);
+    engine.loadBundle(bundleUrl);
+    engineRef.current = engine;
 
-// 自定义池（含限制）
-const pool = createWorkerPool({ maxWorkers: 4 });
-const engine = new PooledEngine({ pool });
+    // 关键：Tab 卸载时清理
+    return () => {
+      engine.destroy();
+      engineRef.current = null;
+    };
+  }, [bundleUrl]);
+
+  return <EngineView engine={engineRef.current} />;
+}
 ```
 
 ## 模块说明
@@ -224,7 +247,7 @@ const engine = new PooledEngine({ pool });
 | 模块 | 路径 | 说明 |
 |------|------|------|
 | SDK | `@rill/core/sdk` | Guest 开发套件，虚组件和 Hooks |
-| Runtime | `@rill/core` | 宿主运行时，Engine/PooledEngine 和 EngineView |
+| Runtime | `@rill/core` | 宿主运行时，Engine 和 EngineView |
 | CLI | `@rill/cli` | Bundle 打包工具 (Vite-based) |
 
 ## API
@@ -232,20 +255,23 @@ const engine = new PooledEngine({ pool });
 ### Engine
 
 ```typescript
-import { Engine, PooledEngine } from '@rill/core';
+import { Engine } from '@rill/core';
 
-// 独立引擎
 const engine = new Engine(options?: EngineOptions);
-
-// 池化引擎（多租户）
-const pooledEngine = new PooledEngine(options?: PooledEngineOptions);
 
 interface EngineOptions {
   sandbox?: 'vm' | 'worker' | 'none';  // 沙箱模式（不设置则自动检测）
   provider?: JSEngineProvider;          // 自定义 Provider
   timeout?: number;                     // 执行超时（默认 5000ms）
   debug?: boolean;                      // 调试模式
-  logger?: Logger;                      // 自定义日志
+  logger?: {                            // 自定义日志
+    log: (...args: unknown[]) => void;
+    warn: (...args: unknown[]) => void;
+    error: (...args: unknown[]) => void;
+  };
+  onMetric?: (name: string, value: number, extra?: Record<string, unknown>) => void;  // 性能指标回调
+  requireWhitelist?: string[];          // 允许的 require() 模块
+  receiverMaxBatchSize?: number;        // 每批次最大操作数（默认 5000）- 关键：保护 Host UI 响应性
 }
 
 // 注册组件
@@ -260,7 +286,29 @@ engine.sendEvent('EVENT_NAME', payload);
 // 更新配置
 engine.updateConfig({ key: value });
 
-// 销毁
+// 监控资源
+const stats = engine.getResourceStats();
+console.log(`定时器: ${stats.timers}, 节点: ${stats.nodes}, 回调: ${stats.callbacks}`);
+
+// 获取唯一引擎 ID
+console.log(`引擎 ID: ${engine.id}`);
+
+// 健康检查
+const health = engine.getHealth();
+
+// 订阅引擎事件
+engine.on('load', () => console.log('Bundle 已加载'));
+engine.on('error', (error: Error) => console.error('Guest 错误:', error));
+engine.on('fatalError', (error: Error) => console.error('致命错误:', error)); // 触发后引擎自动销毁
+engine.on('destroy', () => console.log('引擎已销毁'));
+engine.on('operation', (batch: OperationBatch) => { /* ... */ });
+engine.on('message', (message: GuestMessage) => { /* ... */ });
+
+// 内存泄漏检测（用于 Host 事件监听器）
+engine.setMaxListeners(20);  // 提高监听器阈值
+const limit = engine.getMaxListeners();
+
+// 销毁（释放所有资源：定时器、节点、回调、运行时）
 engine.destroy();
 ```
 
@@ -287,6 +335,31 @@ send('EVENT_NAME', payload);
 - `Image` - 图片组件
 - `ScrollView` - 滚动容器
 - `TouchableOpacity` - 可触摸组件
+- `TextInput` - 文本输入框（带状态管理）
+- `FlatList` - 虚拟化列表（高性能）
+- `Button` - 按钮组件
+- `Switch` - 开关组件
+- `ActivityIndicator` - 加载指示器
+
+### 错误边界
+
+```typescript
+import { RillErrorBoundary } from '@rill/core/sdk';
+
+function App() {
+  return (
+    <RillErrorBoundary
+      fallback={<Text>出错了</Text>}
+      onError={(error, info) => {
+        // info 包含 componentStack
+        sendToHost('RENDER_ERROR', { message: error.message });
+      }}
+    >
+      <MyComponent />
+    </RillErrorBoundary>
+  );
+}
+```
 
 ## 性能优化
 
@@ -316,19 +389,28 @@ const calculator = new VirtualScrollCalculator({
 const monitor = new PerformanceMonitor();
 ```
 
-## 调试工具
+## 调试
+
+使用内置的资源监控和事件跟踪：
 
 ```tsx
-import { createDevTools } from '@rill/core/devtools';
+// 监控资源使用情况
+const stats = engine.getResourceStats();
+console.log('资源:', stats);
 
-const devtools = createDevTools();
-devtools.enable();
+// 追踪错误
+engine.on('error', (error: Error) => {
+  console.error('[Guest 错误]', error);
+});
 
-// 查看组件树
-console.log(devtools.getComponentTreeText(nodeMap, rootChildren));
+engine.on('fatalError', (error: Error) => {
+  console.error('[致命错误 - 引擎已销毁]', error);
+});
 
-// 导出调试数据
-const data = devtools.exportAll();
+// 监控操作
+engine.on('operation', (batch) => {
+  console.log(`操作数量: ${batch.operations.length}`);
+});
 ```
 
 ## 文档

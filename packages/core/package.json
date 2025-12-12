@@ -21,7 +21,8 @@
   "exports": {
     ".": "./src/runtime/index.ts",
     "./sdk": "./src/sdk/index.ts",
-    "./types": "./src/types.ts"
+    "./types": "./src/types.ts",
+    "./devtools": "./src/devtools/index.ts"
   },
   "sideEffects": false,
   "files": [

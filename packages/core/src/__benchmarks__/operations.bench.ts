@@ -7,22 +7,18 @@
  * - Batch processing performance
  */
 
-import { describe, it, beforeEach, afterEach } from 'vitest';
-import {
-  OperationMerger,
-  ThrottledScheduler,
-  PerformanceMonitor,
-} from '../runtime/performance';
-import { benchmark } from './utils/benchmark';
-import type { BenchmarkResult } from './utils/benchmark';
+import { afterEach, beforeEach, describe, it } from 'vitest';
+import { OperationMerger, PerformanceMonitor, ThrottledScheduler } from '../runtime/performance';
 import type { Operation, OperationBatch } from '../types';
+import type { BenchmarkResult } from './utils/benchmark';
+import { benchmark } from './utils/benchmark';
 
 describe('Operations Benchmarks', () => {
   const results: BenchmarkResult[] = [];
 
   afterEach(() => {
     if (results.length > 0) {
-      console.log('\n' + '='.repeat(80));
+      console.log(`\n${'='.repeat(80)}`);
       console.log('OPERATIONS BENCHMARK RESULTS');
       console.log('='.repeat(80));
       results.forEach((result) => {
@@ -33,7 +29,7 @@ describe('Operations Benchmarks', () => {
         console.log(`  Max: ${result.max.toFixed(3)}ms`);
         console.log(`  Ops/sec: ${result.ops.toFixed(0)}`);
       });
-      console.log('\n' + '='.repeat(80) + '\n');
+      console.log(`\n${'='.repeat(80)}\n`);
     }
   });
 
