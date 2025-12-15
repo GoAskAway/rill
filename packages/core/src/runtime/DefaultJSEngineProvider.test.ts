@@ -3,13 +3,23 @@ import { DefaultJSEngineProvider } from './DefaultJSEngineProvider';
 
 describe('DefaultJSEngineProvider', () => {
   let consoleWarnSpy: ReturnType<typeof spyOn>;
+  // Save original RN globals in case another test set them
+  let savedReactNative: unknown;
 
   beforeEach(() => {
     consoleWarnSpy = spyOn(console, 'warn').mockImplementation(() => {});
+    // Clean up any stray RN globals that might have been set by other tests
+    // This ensures VMProvider tests work correctly in parallel test execution
+    savedReactNative = globalThis.ReactNative;
+    delete globalThis.ReactNative;
   });
 
   afterEach(() => {
     consoleWarnSpy.mockRestore();
+    // Restore if something was there before
+    if (savedReactNative !== undefined) {
+      globalThis.ReactNative = savedReactNative;
+    }
   });
 
   it('should create a provider with default options', () => {
@@ -73,8 +83,10 @@ describe('DefaultJSEngineProvider', () => {
       );
     } finally {
       // Restore Worker
-      if (originalWorker) {
+      if (originalWorker !== undefined) {
         globalThis.Worker = originalWorker;
+      } else {
+        delete (globalThis as any).Worker;
       }
     }
   });
@@ -94,8 +106,9 @@ describe('DefaultJSEngineProvider', () => {
   });
 
   it('should handle missing vm module gracefully', () => {
-    // Save original process
+    // Save original process and Worker
     const originalProcess = globalThis.process;
+    const originalWorker = globalThis.Worker;
 
     try {
       // Remove process temporarily to simulate non-Node environment
@@ -111,8 +124,15 @@ describe('DefaultJSEngineProvider', () => {
       );
     } finally {
       // Restore
-      if (originalProcess) {
+      if (originalProcess !== undefined) {
         globalThis.process = originalProcess;
+      } else {
+        delete (globalThis as any).process;
+      }
+      if (originalWorker !== undefined) {
+        globalThis.Worker = originalWorker;
+      } else {
+        delete (globalThis as any).Worker;
       }
     }
   });
@@ -148,11 +168,15 @@ describe('DefaultJSEngineProvider', () => {
       );
     } finally {
       // Restore
-      if (originalProcess) {
+      if (originalProcess !== undefined) {
         globalThis.process = originalProcess;
+      } else {
+        delete (globalThis as any).process;
       }
-      if (originalWorker) {
+      if (originalWorker !== undefined) {
         globalThis.Worker = originalWorker;
+      } else {
+        delete (globalThis as any).Worker;
       }
     }
   });
@@ -303,8 +327,10 @@ describe('DefaultJSEngineProvider', () => {
       }
     } finally {
       // Restore
-      if (originalProcess) {
+      if (originalProcess !== undefined) {
         globalThis.process = originalProcess;
+      } else {
+        delete (globalThis as any).process;
       }
     }
   });
@@ -323,8 +349,10 @@ describe('DefaultJSEngineProvider', () => {
       // Should fall back to another provider
       expect(provider).toBeDefined();
     } finally {
-      if (originalWorker) {
+      if (originalWorker !== undefined) {
         globalThis.Worker = originalWorker;
+      } else {
+        delete (globalThis as any).Worker;
       }
     }
   });
