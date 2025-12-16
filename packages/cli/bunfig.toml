@@ -1,4 +1,4 @@
 [test]
-preload = ["../rill/src/__tests__/setup.ts"]
+preload = ["../core/src/__tests__/setup.ts"]
 timeout = 10000
 root = "./src"
