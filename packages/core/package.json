@@ -65,7 +65,7 @@
     "react": ">=18.0.0",
     "react-native": ">=0.70.0",
     "react-reconciler": ">=0.29.0",
-    "react-native-jsc-sandbox": ">=0.1.0",
+    "react-native-jsc-sandbox": "github:GoAskAway/react-native-jsc-sandbox",
     "react-native-quickjs": ">=0.1.0"
   },
   "peerDependenciesMeta": {
