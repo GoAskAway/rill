@@ -1,10 +1,10 @@
 import { describe, expect, it, mock } from 'bun:test';
 import type { JSEngineContext, JSEngineProvider, JSEngineRuntime } from './engine';
 import {
-  type RNJSCSandboxProviderOptions,
-  RNJSCSandboxProvider,
   isApplePlatform,
   isJSCSandboxAvailable,
+  RNJSCSandboxProvider,
+  type RNJSCSandboxProviderOptions,
   resolveJSCSandbox,
 } from './RNJSCSandboxProvider';
 
