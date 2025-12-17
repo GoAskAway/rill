@@ -1,218 +1,218 @@
 {
   "Engine.new": {
     "name": "Engine.new",
-    "mean": 0.021,
-    "median": 0.017,
-    "min": 0.007,
-    "max": 0.104,
-    "ops": 47608
+    "mean": 0.015,
+    "median": 0.011,
+    "min": 0.003,
+    "max": 0.087,
+    "ops": 64640
   },
   "Engine.loadBundle (simple)": {
     "name": "Engine.loadBundle (simple)",
-    "mean": 0.235,
-    "median": 0.22,
-    "min": 0.103,
-    "max": 0.969,
-    "ops": 4251
+    "mean": 0.227,
+    "median": 0.244,
+    "min": 0.102,
+    "max": 0.345,
+    "ops": 4413
   },
   "Engine.loadBundle (medium)": {
     "name": "Engine.loadBundle (medium)",
-    "mean": 0.154,
-    "median": 0.135,
-    "min": 0.104,
-    "max": 0.281,
-    "ops": 6495
+    "mean": 0.182,
+    "median": 0.195,
+    "min": 0.109,
+    "max": 0.273,
+    "ops": 5484
   },
   "Engine.loadBundle (large)": {
     "name": "Engine.loadBundle (large)",
-    "mean": 0.168,
-    "median": 0.159,
-    "min": 0.125,
-    "max": 0.256,
-    "ops": 5959
+    "mean": 0.18,
+    "median": 0.162,
+    "min": 0.117,
+    "max": 0.302,
+    "ops": 5559
   },
   "Engine.sendEvent": {
     "name": "Engine.sendEvent",
-    "mean": 0.021,
-    "median": 0.019,
+    "mean": 0.016,
+    "median": 0.014,
     "min": 0.007,
-    "max": 0.591,
-    "ops": 46953
+    "max": 0.176,
+    "ops": 63410
   },
   "Engine.updateConfig": {
     "name": "Engine.updateConfig",
     "mean": 0.011,
     "median": 0.01,
-    "min": 0.006,
-    "max": 0.144,
-    "ops": 94364
+    "min": 0.005,
+    "max": 0.147,
+    "ops": 94627
   },
   "Engine.createReceiver": {
     "name": "Engine.createReceiver",
-    "mean": 0.003,
-    "median": 0.001,
+    "mean": 0.004,
+    "median": 0.002,
     "min": 0.001,
-    "max": 0.044,
-    "ops": 306393
+    "max": 0.047,
+    "ops": 243797
   },
   "OperationMerger.merge (10 UPDATEs)": {
     "name": "OperationMerger.merge (10 UPDATEs)",
-    "mean": 0.004,
+    "mean": 0.005,
     "median": 0.004,
-    "min": 0.004,
-    "max": 0.034,
-    "ops": 222459
+    "min": 0.002,
+    "max": 0.054,
+    "ops": 205962
   },
   "OperationMerger.merge (100 UPDATEs)": {
     "name": "OperationMerger.merge (100 UPDATEs)",
-    "mean": 0.22,
-    "median": 0.212,
+    "mean": 0.16,
+    "median": 0.142,
     "min": 0.115,
-    "max": 1.422,
-    "ops": 4539
+    "max": 0.799,
+    "ops": 6242
   },
   "OperationMerger.merge (1000 mixed)": {
     "name": "OperationMerger.merge (1000 mixed)",
-    "mean": 0.133,
-    "median": 0.131,
-    "min": 0.126,
-    "max": 0.174,
-    "ops": 7513
+    "mean": 0.127,
+    "median": 0.124,
+    "min": 0.119,
+    "max": 0.177,
+    "ops": 7880
   },
   "OperationMerger.merge (no merging possible)": {
     "name": "OperationMerger.merge (no merging possible)",
-    "mean": 0.021,
-    "median": 0.021,
-    "min": 0.011,
-    "max": 0.709,
-    "ops": 48101
+    "mean": 0.016,
+    "median": 0.014,
+    "min": 0.007,
+    "max": 0.869,
+    "ops": 63610
   },
   "ThrottledScheduler.enqueue (single)": {
     "name": "ThrottledScheduler.enqueue (single)",
-    "mean": 0.002,
-    "median": 0.002,
+    "mean": 0.001,
+    "median": 0.001,
     "min": 0.001,
-    "max": 0.05,
-    "ops": 457122
+    "max": 0.046,
+    "ops": 683319
   },
   "ThrottledScheduler.enqueueAll (10)": {
     "name": "ThrottledScheduler.enqueueAll (10)",
-    "mean": 0.004,
-    "median": 0.003,
-    "min": 0.002,
+    "mean": 0.002,
+    "median": 0.002,
+    "min": 0.001,
     "max": 0.029,
-    "ops": 275633
+    "ops": 403801
   },
   "ThrottledScheduler.enqueueAll (100)": {
     "name": "ThrottledScheduler.enqueueAll (100)",
-    "mean": 0.012,
-    "median": 0.012,
-    "min": 0.011,
-    "max": 0.033,
-    "ops": 80541
+    "mean": 0.008,
+    "median": 0.007,
+    "min": 0.006,
+    "max": 0.024,
+    "ops": 129243
   },
   "ThrottledScheduler.enqueueAll (100 with merge)": {
     "name": "ThrottledScheduler.enqueueAll (100 with merge)",
-    "mean": 0.175,
-    "median": 0.141,
-    "min": 0.122,
-    "max": 0.711,
-    "ops": 5698
+    "mean": 0.177,
+    "median": 0.14,
+    "min": 0.124,
+    "max": 1.325,
+    "ops": 5635
   },
   "PerformanceMonitor.recordBatch (single)": {
     "name": "PerformanceMonitor.recordBatch (single)",
     "mean": 0.001,
-    "median": 0.001,
+    "median": 0,
     "min": 0,
     "max": 0.026,
-    "ops": 1305342
+    "ops": 1582536
   },
   "PerformanceMonitor.recordBatch (100 ops)": {
     "name": "PerformanceMonitor.recordBatch (100 ops)",
     "mean": 0.001,
     "median": 0.001,
     "min": 0.001,
-    "max": 0.017,
-    "ops": 942742
+    "max": 0.014,
+    "ops": 1024697
   },
   "PerformanceMonitor.getMetrics": {
     "name": "PerformanceMonitor.getMetrics",
     "mean": 0,
     "median": 0,
     "min": 0,
-    "max": 0.018,
-    "ops": 3555831
+    "max": 0.015,
+    "ops": 3633083
   },
   "Full pipeline (10k operations)": {
     "name": "Full pipeline (10k operations)",
-    "mean": 2.633,
-    "median": 2.075,
-    "min": 1.753,
-    "max": 8.172,
-    "ops": 380
+    "mean": 2.277,
+    "median": 2.159,
+    "min": 1.724,
+    "max": 3.753,
+    "ops": 439
   },
   "Receiver.applyBatch (1 node)": {
     "name": "Receiver.applyBatch (1 node)",
-    "mean": 0.01,
-    "median": 0.008,
-    "min": 0.004,
-    "max": 0.203,
-    "ops": 98769
+    "mean": 0.007,
+    "median": 0.005,
+    "min": 0.002,
+    "max": 0.073,
+    "ops": 147673
   },
   "Receiver.applyBatch (10 nodes)": {
     "name": "Receiver.applyBatch (10 nodes)",
-    "mean": 0.017,
-    "median": 0.015,
-    "min": 0.005,
-    "max": 0.055,
-    "ops": 59194
+    "mean": 0.012,
+    "median": 0.01,
+    "min": 0.004,
+    "max": 0.063,
+    "ops": 80654
   },
   "Receiver.applyBatch (100 nodes)": {
     "name": "Receiver.applyBatch (100 nodes)",
-    "mean": 0.124,
-    "median": 0.118,
-    "min": 0.065,
-    "max": 0.808,
-    "ops": 8057
+    "mean": 0.063,
+    "median": 0.042,
+    "min": 0.035,
+    "max": 0.141,
+    "ops": 15982
   },
   "Receiver.applyBatch (1000 nodes)": {
     "name": "Receiver.applyBatch (1000 nodes)",
-    "mean": 0.666,
-    "median": 0.676,
-    "min": 0.511,
-    "max": 0.884,
-    "ops": 1502
+    "mean": 0.69,
+    "median": 0.686,
+    "min": 0.584,
+    "max": 0.906,
+    "ops": 1449
   },
   "Receiver.applyBatch (100 UPDATEs)": {
     "name": "Receiver.applyBatch (100 UPDATEs)",
-    "mean": 0.132,
-    "median": 0.093,
-    "min": 0.068,
-    "max": 0.969,
-    "ops": 7570
+    "mean": 0.115,
+    "median": 0.08,
+    "min": 0.06,
+    "max": 0.895,
+    "ops": 8669
   },
   "Receiver.applyBatch (100 DELETEs)": {
     "name": "Receiver.applyBatch (100 DELETEs)",
-    "mean": 0.405,
-    "median": 0.246,
-    "min": 0.221,
-    "max": 4.007,
-    "ops": 2472
+    "mean": 0.275,
+    "median": 0.228,
+    "min": 0.208,
+    "max": 0.668,
+    "ops": 3638
   },
   "Receiver.render (10 nodes)": {
     "name": "Receiver.render (10 nodes)",
-    "mean": 0.024,
-    "median": 0.019,
-    "min": 0.012,
-    "max": 1.021,
-    "ops": 42012
+    "mean": 0.021,
+    "median": 0.017,
+    "min": 0.01,
+    "max": 0.724,
+    "ops": 47068
   },
   "Receiver.render (100 nodes)": {
     "name": "Receiver.render (100 nodes)",
-    "mean": 0.147,
-    "median": 0.115,
-    "min": 0.098,
-    "max": 1.46,
-    "ops": 6808
+    "mean": 0.127,
+    "median": 0.107,
+    "min": 0.094,
+    "max": 0.875,
+    "ops": 7846
   }
 }
