@@ -20,8 +20,6 @@ class MockWorker {
         this.respond(message.id, 'eval result');
       } else if (message.type === 'setGlobal') {
         // No response for setGlobal (fire-and-forget)
-      } else if (message.type === 'getGlobal') {
-        this.respond(message.id, 'global value');
       } else if (message.type === 'dispose') {
         this.respond(message.id, null);
       }
@@ -152,13 +150,14 @@ describe('WorkerJSEngineProvider', () => {
     expect(consoleMessages.length).toBe(0);
   });
 
-  it('should support getGlobal', async () => {
+  it('should return undefined for getGlobal (Workers cannot do sync cross-thread)', async () => {
     const provider = new WorkerJSEngineProvider(() => new MockWorker() as unknown as Worker);
     const runtime = await provider.createRuntime();
     const context = runtime.createContext();
 
-    const result = await context.getGlobal?.('testVar');
-    expect(result).toBe('global value');
+    // Worker getGlobal returns undefined since it cannot do synchronous cross-thread communication
+    const result = context.getGlobal('testVar');
+    expect(result).toBeUndefined();
   });
 
   it('should support dispose', async () => {
@@ -166,24 +165,9 @@ describe('WorkerJSEngineProvider', () => {
     const runtime = await provider.createRuntime();
     const context = runtime.createContext();
 
-    await context.dispose();
+    context.dispose();
     // Should not throw
     expect(true).toBe(true);
-  });
-
-  it('should respect interrupt handler', async () => {
-    const provider = new WorkerJSEngineProvider(() => new MockWorker() as unknown as Worker);
-    const runtime = await provider.createRuntime();
-    const context = runtime.createContext();
-
-    let interrupted = false;
-    context.setInterruptHandler?.(() => {
-      interrupted = true;
-      return true;
-    });
-
-    await expect(context.evalAsync?.('code')).rejects.toThrow('interrupted');
-    expect(interrupted).toBe(true);
   });
 
   it('should pass timeout option', async () => {

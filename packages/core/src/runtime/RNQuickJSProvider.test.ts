@@ -195,22 +195,6 @@ describe('RNQuickJSProvider', () => {
     // After dispose, createContext should throw
     expect(() => runtime.createContext()).toThrow();
   });
-
-  it('should support interrupt handler', () => {
-    const mockQuickJS = new MockRNQuickJS();
-    const provider = new RNQuickJSProvider(mockQuickJS);
-
-    const runtime = provider.createRuntime();
-    const context = runtime.createContext();
-
-    if (context.setInterruptHandler && context.clearInterruptHandler) {
-      const handler = mock(() => false);
-      context.setInterruptHandler(handler);
-      context.clearInterruptHandler();
-      // Should not throw
-      expect(true).toBe(true);
-    }
-  });
 });
 
 describe('resolveRNQuickJS', () => {

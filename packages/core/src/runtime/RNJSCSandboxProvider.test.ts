@@ -59,8 +59,6 @@ describe('RNJSCSandboxProvider native implementation logic', () => {
     setGlobal(name: string, value: unknown): void;
     getGlobal(name: string): Promise<unknown>;
     dispose(): void;
-    setInterruptHandler?(handler: () => boolean): void;
-    clearInterruptHandler?(): void;
   }
 
   interface MockJSCSandboxRuntime {
@@ -89,7 +87,10 @@ describe('RNJSCSandboxProvider native implementation logic', () => {
         createContext: (): JSEngineContext => {
           const ctx = rt.createContext();
 
-          const wrappedContext: JSEngineContext = {
+          // Test provider with evalAsync (non-standard extension)
+          const wrappedContext: JSEngineContext & {
+            evalAsync: (code: string) => Promise<unknown>;
+          } = {
             eval: (_code: string): unknown => {
               throw new Error(
                 '[RNJSCSandboxProvider] Synchronous eval not supported. Use evalAsync instead.'
@@ -107,12 +108,6 @@ describe('RNJSCSandboxProvider native implementation logic', () => {
             dispose: (): void => {
               ctx.dispose();
             },
-            setInterruptHandler: ctx.setInterruptHandler
-              ? (handler: () => boolean) => ctx.setInterruptHandler!(handler)
-              : undefined,
-            clearInterruptHandler: ctx.clearInterruptHandler
-              ? () => ctx.clearInterruptHandler!()
-              : undefined,
           };
 
           return wrappedContext;
@@ -132,7 +127,6 @@ describe('RNJSCSandboxProvider native implementation logic', () => {
   class MockContext implements MockJSCSandboxContext {
     private globals = new Map<string, unknown>();
     private disposed = false;
-    private interruptHandler: (() => boolean) | null = null;
 
     eval(_code: string): unknown {
       throw new Error('Synchronous eval not supported');
@@ -141,9 +135,6 @@ describe('RNJSCSandboxProvider native implementation logic', () => {
     async evalAsync(code: string): Promise<unknown> {
       if (this.disposed) {
         throw new Error('Context has been disposed');
-      }
-      if (this.interruptHandler?.()) {
-        throw new Error('Execution interrupted');
       }
       // Simple eval simulation
       try {
@@ -169,15 +160,6 @@ describe('RNJSCSandboxProvider native implementation logic', () => {
     dispose(): void {
       this.disposed = true;
       this.globals.clear();
-      this.interruptHandler = null;
-    }
-
-    setInterruptHandler(handler: () => boolean): void {
-      this.interruptHandler = handler;
-    }
-
-    clearInterruptHandler(): void {
-      this.interruptHandler = null;
     }
   }
 
@@ -302,52 +284,6 @@ describe('RNJSCSandboxProvider native implementation logic', () => {
 
     // After dispose, createContext should throw
     expect(() => runtime.createContext()).toThrow('disposed');
-  });
-
-  it('should support interrupt handler when available', () => {
-    const mockProvider = new MockProvider();
-    const provider = new TestableJSCSandboxProvider(mockProvider);
-
-    const runtime = provider.createRuntime();
-    const context = runtime.createContext();
-
-    expect(context.setInterruptHandler).toBeDefined();
-    expect(context.clearInterruptHandler).toBeDefined();
-
-    const handler = mock(() => false);
-    context.setInterruptHandler!(handler);
-    context.clearInterruptHandler!();
-
-    // Should not throw
-    expect(true).toBe(true);
-  });
-
-  it('should handle context without interrupt handler methods', () => {
-    // Create a context that doesn't have interrupt handler methods
-    class NoInterruptContext extends MockContext {
-      setInterruptHandler = undefined as any;
-      clearInterruptHandler = undefined as any;
-    }
-
-    class NoInterruptRuntime extends MockRuntime {
-      createContext(): MockJSCSandboxContext {
-        return new NoInterruptContext();
-      }
-    }
-
-    class NoInterruptProvider implements MockJSCSandboxProviderLike {
-      createRuntime(): MockJSCSandboxRuntime {
-        return new NoInterruptRuntime();
-      }
-    }
-
-    const provider = new TestableJSCSandboxProvider(new NoInterruptProvider());
-    const runtime = provider.createRuntime();
-    const context = runtime.createContext();
-
-    // Should not have interrupt handler methods
-    expect(context.setInterruptHandler).toBeUndefined();
-    expect(context.clearInterruptHandler).toBeUndefined();
   });
 
   it('should handle multiple contexts from same runtime', async () => {

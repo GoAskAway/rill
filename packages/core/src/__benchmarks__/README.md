@@ -210,6 +210,6 @@ bun test --run src/__benchmarks__/*.bench.ts
 
 ## Related Documentation
 
-- [Performance Optimization Guide](../../docs/guides/performance.md)
-- [Advanced Features Example](../../examples/advanced-features/)
-- [Production Checklist](../../docs/guides/production-checklist.md)
+- [Production Guide](../../../../docs/PRODUCTION_GUIDE.md)
+- [Advanced Features Example](../../../../examples/advanced-features/)
+- [Architecture Design](../../../../docs/ARCHITECTURE.md)
