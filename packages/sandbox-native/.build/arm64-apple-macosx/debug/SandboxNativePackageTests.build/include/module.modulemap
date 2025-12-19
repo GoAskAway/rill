@@ -1,3 +1,0 @@
-module SandboxNativePackageTests {
-    header "/Users/leo/XData/Starbucks/GoAskAway/rill/packages/sandbox-native/.build/arm64-apple-macosx/debug/SandboxNativePackageTests.build/include/SandboxNativePackageTests-Swift.h"
-}

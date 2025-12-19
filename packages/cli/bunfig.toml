@@ -1,4 +1,0 @@
-[test]
-preload = ["../runtime/src/__tests__/setup.ts"]
-timeout = 10000
-root = "./src"
