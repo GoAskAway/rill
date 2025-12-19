@@ -1,0 +1,63 @@
+{
+  "name": "@rill/runtime",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Host-side runtime for rill - sandbox management, operation receiving, and UI rendering",
+  "author": "kookyleo <kookyleo@gmail.com>",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kookyleo/rill.git"
+  },
+  "keywords": [
+    "rill",
+    "runtime",
+    "sandbox",
+    "dynamic-ui"
+  ],
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./types": "./src/types.ts"
+  },
+  "sideEffects": false,
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "test:coverage": "bun test --coverage",
+    "test:coverage:check": "node scripts/check-coverage.cjs",
+    "bench": "bun test --run ./src/__benchmarks__/*.bench.ts",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@rill/sandbox": "workspace:*",
+    "@rill/let": "workspace:*",
+    "@rill/devtools": "workspace:*"
+  },
+  "devDependencies": {
+    "@happy-dom/global-registrator": "^17.4.4",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.0",
+    "@types/bun": "^1.2.14",
+    "@types/react": "^19.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "react-native": "0.79.6",
+    "react-test-renderer": "19.0.0",
+    "typescript": "^5.3.0"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  }
+}

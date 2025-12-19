@@ -25,8 +25,8 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsc",
-    "build:watch": "tsc --watch",
+    "build": "bun build ./src/index.ts --outfile ./dist/index.js --target bun",
+    "build:watch": "bun build ./src/index.ts --outfile ./dist/index.js --target bun --watch",
     "test": "bun test",
     "test:watch": "bun test --watch",
     "lint": "eslint src --ext .ts",
@@ -37,8 +37,8 @@
   "dependencies": {
     "commander": "^11.0.0",
     "oxc-parser": "^0.101.0",
-    "@rill/core": "file:../core",
-    "vite": "^6.0.0"
+    "@rill/runtime": "workspace:*",
+    "@rill/let": "workspace:*"
   },
   "devDependencies": {
     "@types/bun": "latest",
