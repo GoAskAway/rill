@@ -1,0 +1,33 @@
+{
+  "name": "@rill/sandbox-native",
+  "version": "0.1.0",
+  "description": "Native JS sandbox via JSI (QuickJS & JSC)",
+  "homepage": "https://github.com/GoAskAway/rill",
+  "repository": "https://github.com/GoAskAway/rill.git",
+  "license": "Apache-2.0",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./quickjs": "./src/QuickJSModule.ts",
+    "./jsc": "./src/JSCModule.ts"
+  },
+  "files": [
+    "src",
+    "quickjs",
+    "jsc",
+    "jsi",
+    "platform",
+    "react-native.config.js"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-native": ">=0.70.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0"
+  }
+}

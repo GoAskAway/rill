@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "paths": {
+      "@rill/sandbox": ["./src/index.ts"],
+      "@rill/sandbox/types": ["./src/types/provider.ts"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "src/**/*.test.ts", "src/**/*.native.ts"],
+  "references": [{ "path": "../sandbox-web" }, { "path": "../sandbox-native" }]
+}

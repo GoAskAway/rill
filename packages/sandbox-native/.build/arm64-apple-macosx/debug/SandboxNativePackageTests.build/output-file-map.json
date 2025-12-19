@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Users/leo/XData/Starbucks/GoAskAway/rill/packages/sandbox-native/.build/arm64-apple-macosx/debug/SandboxNativePackageTests.build/master.swiftdeps"
+  },
+  "/Users/leo/XData/Starbucks/GoAskAway/rill/packages/sandbox-native/.build/arm64-apple-macosx/debug/SandboxNativePackageTests.derived/runner.swift": {
+    "dependencies": "/Users/leo/XData/Starbucks/GoAskAway/rill/packages/sandbox-native/.build/arm64-apple-macosx/debug/SandboxNativePackageTests.build/runner.d",
+    "object": "/Users/leo/XData/Starbucks/GoAskAway/rill/packages/sandbox-native/.build/arm64-apple-macosx/debug/SandboxNativePackageTests.build/runner.swift.o",
+    "swiftmodule": "/Users/leo/XData/Starbucks/GoAskAway/rill/packages/sandbox-native/.build/arm64-apple-macosx/debug/SandboxNativePackageTests.build/runner~partial.swiftmodule",
+    "swift-dependencies": "/Users/leo/XData/Starbucks/GoAskAway/rill/packages/sandbox-native/.build/arm64-apple-macosx/debug/SandboxNativePackageTests.build/runner.swiftdeps",
+    "diagnostics": "/Users/leo/XData/Starbucks/GoAskAway/rill/packages/sandbox-native/.build/arm64-apple-macosx/debug/SandboxNativePackageTests.build/runner.dia"
+  }
+}

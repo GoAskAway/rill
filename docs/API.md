@@ -553,126 +553,125 @@ monitor.reset();
 
 ---
 
-## DevTools (@rill/core/devtools)
+## DevTools (@rill/devtools)
 
-Development and debugging tools for Rill applications.
+Development and debugging tools for Rill applications. Provides operation logging, performance profiling, and error tracking.
+
+Guest-side data is automatically collected by:
+- **DEVTOOLS_SHIM** - Console/error interception (injected by Engine when `devtools: true`)
+- **Reconciler** - Render timing (integrated in @rill/let)
 
 ### createDevTools
 
-Create a DevTools instance with component inspection, operation logging, and timeline recording.
+Create a DevTools instance.
 
 ```tsx
-import { createDevTools } from '@rill/core/devtools';
+import { createDevTools } from '@rill/devtools';
 
 const devtools = createDevTools({
-  inspector: {
-    maxDepth: 10,           // Max component tree depth
-    filterProps: ['style'], // Hide sensitive props
-    showFunctions: false,   // Show function props
-    highlightChanges: true, // Highlight changed nodes
+  runtime: {
+    maxLogs: 100,           // Max operation logs to keep
+    maxTimelineEvents: 500, // Max timeline events
   },
-  maxLogs: 100,            // Max operation logs
-  maxTimelineEvents: 500,  // Max timeline events
 });
 
 // Enable/disable
 devtools.enable();
 devtools.disable();
 
-// Handle engine events
-engine.on('operation', (batch) => {
-  devtools.onBatch(batch);
-});
+// Connect to engine (auto-subscribes to events)
+devtools.connectEngine(engine);
 
 // Get component tree
-const tree = devtools.getComponentTree(nodeMap, rootChildren);
-const treeText = devtools.getComponentTreeText(nodeMap, rootChildren);
+const tree = devtools.getHostTree();
+const treeText = devtools.getHostTreeText();
 
 // Export debug data
-const data = devtools.exportAll();
+const data = devtools.export();
 
 // Reset all data
 devtools.reset();
 ```
 
-### ComponentInspector
+### Event Subscription
 
-Inspect and visualize component tree structure.
+Subscribe to devtools events.
 
 ```tsx
-import { ComponentInspector } from '@rill/core/devtools';
-
-const inspector = new ComponentInspector({
-  maxDepth: 10,
-  filterProps: ['style'],
-  showFunctions: false,
-  highlightChanges: true,
+// Available events: 'console', 'error', 'render', 'operation'
+devtools.subscribe('error', (event) => {
+  console.log('Guest error:', event.data);
 });
 
-// Build tree from node map
-const tree = inspector.buildTree(nodeMap, rootChildren);
-
-// Get text representation
-const text = inspector.toText(tree);
-console.log(text);
-// └─ <View flex={1}>
-//    ├─ <Text>Hello</Text>
-//    └─ <Button title="Click">
-
-// Record changes
-inspector.recordChange(nodeId);
-inspector.clearHighlights();
+devtools.subscribe('operation', (event) => {
+  console.log('Operations:', event.data);
+});
 ```
 
-### OperationLogger
+### Profiling
 
-Log and analyze operations.
+Record and analyze performance.
 
 ```tsx
-import { OperationLogger } from '@rill/core/devtools';
+// Start profiling
+devtools.startProfiling();
 
-const logger = new OperationLogger(100); // Keep last 100 logs
+// ... user interactions ...
 
-// Log batch
-logger.log(batch, duration);
+// Stop and get report
+const report = devtools.stopProfiling();
 
-// Query logs
-const logs = logger.getLogs();
-const recent = logger.getRecentLogs(10);
-const creates = logger.filterByType('CREATE');
-const nodeOps = logger.filterByNodeId(1);
-const stats = logger.getStats();
-
-// Export/clear
-const exported = logger.export();
-logger.clear();
+console.log(report.summary);
+// {
+//   totalOperations: 150,
+//   totalRenders: 25,
+//   avgOperationTime: 2.5,
+//   avgRenderTime: 8.3,
+//   slowestNodes: [...],
+//   errorCount: 0,
+// }
 ```
 
-### TimelineRecorder
+### Data Access
 
-Record timeline events for performance analysis.
+Access collected debug data.
 
 ```tsx
-import { TimelineRecorder } from '@rill/core/devtools';
+// Host data
+const tree = devtools.getHostTree();        // Component tree
+const metrics = devtools.getHostMetrics();  // Performance metrics
+const status = devtools.getSandboxStatus(); // Sandbox state
+const logs = devtools.getOperationLogs();   // Operation history
 
-const timeline = new TimelineRecorder(500); // Keep last 500 events
+// Guest data
+const consoleLogs = devtools.getConsoleLogs(); // Console output
+const errors = devtools.getErrors();           // Errors
+const ready = devtools.isGuestReady();         // Guest ready state
+```
+
+### RuntimeCollector (Low-level)
+
+For direct integration without Engine connection.
+
+```tsx
+import { createRuntimeCollector } from '@rill/devtools';
+
+const collector = createRuntimeCollector({ maxLogs: 100 });
+collector.enable();
+
+// Log operations
+collector.logBatch(batch, duration);
 
 // Record events
-timeline.recordMount(nodeId, type);
-timeline.recordUpdate(nodeId, changedProps);
-timeline.recordUnmount(nodeId);
-timeline.recordBatch(batchId, count, duration);
-timeline.recordCallback(fnId, args);
-timeline.recordHostEvent(eventName, payload);
+collector.recordCallback(fnId, args);
+collector.recordHostEvent(eventName, payload);
 
-// Query events
-const events = timeline.getEvents();
-const rangeEvents = timeline.getEventsInRange(startTime, endTime);
-const mounts = timeline.getEventsByType('mount');
+// Build tree from node map
+const tree = collector.buildTree(nodeMap, rootChildren);
 
-// Export/reset
-const exported = timeline.export();
-timeline.reset();
+// Get stats
+const stats = collector.getOperationStats();
+const timeline = collector.getTimeline();
 ```
 
 ---
