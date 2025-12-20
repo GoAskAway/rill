@@ -27,10 +27,17 @@
     "README.md",
     "LICENSE"
   ],
+  "codegenConfig": {
+    "name": "RillSandboxNative",
+    "type": "modules",
+    "jsSrcsDir": "src/native-specs"
+  },
   "scripts": {
     "build": "bun run --filter '*' build",
     "test": "bun test",
     "test:sandbox-web": "vitest run packages/sandbox-web/src",
+    "test:e2e": "bunx playwright test --config tests/e2e-sandbox-web/playwright.config.ts",
+    "test:e2e-sww": "bun run test:e2e",
     "lint": "bun run --filter '*' lint",
     "typecheck": "bun run --filter '*' typecheck",
     "format": "biome format --write .",
