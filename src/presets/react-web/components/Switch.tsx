@@ -4,7 +4,7 @@
  * Maps to checkbox input styled as toggle
  */
 
-import React from 'react';
+import type React from 'react';
 
 export interface SwitchProps {
   value?: boolean;
@@ -42,6 +42,8 @@ export function Switch({
   };
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: Switch component uses div for styling, click handler is intentional
+    // biome-ignore lint/a11y/useKeyWithClickEvents: Switch is a controlled component, keyboard interaction handled by parent
     <div
       style={containerStyle}
       className={className}

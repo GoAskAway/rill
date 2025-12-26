@@ -4,7 +4,7 @@
  * Maps to button element
  */
 
-import React from 'react';
+import type React from 'react';
 
 export interface ButtonProps {
   title: string;
@@ -32,7 +32,7 @@ export function Button({
   };
 
   return (
-    <button style={style} className={className} onClick={onPress} disabled={disabled}>
+    <button type="button" style={style} className={className} onClick={onPress} disabled={disabled}>
       {title}
     </button>
   );

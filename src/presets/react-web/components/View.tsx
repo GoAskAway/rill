@@ -4,7 +4,7 @@
  * Maps to div element with flexbox layout
  */
 
-import React from 'react';
+import type React from 'react';
 
 export interface ViewProps {
   style?: React.CSSProperties;
@@ -21,6 +21,8 @@ export function View({ style, children, className, onClick }: ViewProps): React.
   };
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: View is a container component with optional click handler
+    // biome-ignore lint/a11y/useKeyWithClickEvents: Generic container, keyboard interaction handled by parent when needed
     <div style={baseStyle} className={className} onClick={onClick}>
       {children}
     </div>

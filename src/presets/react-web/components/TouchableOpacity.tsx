@@ -4,7 +4,8 @@
  * Maps to button-like div with hover opacity
  */
 
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 
 export interface TouchableOpacityProps {
   style?: React.CSSProperties;
@@ -34,6 +35,8 @@ export function TouchableOpacity({
   };
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: TouchableOpacity is a pressable container component
+    // biome-ignore lint/a11y/useKeyWithClickEvents: Touchable component for mobile-like interactions, keyboard handled by parent
     <div
       style={baseStyle}
       className={className}

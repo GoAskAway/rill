@@ -4,33 +4,31 @@
 
 Rill is a lightweight React Native dynamic UI rendering engine that allows running React components in a sandbox environment and passing the render results to the host application.
 
-## Module Structure
+## Package Exports
 
 ```
-@rill/core/
-├── (default export)  # Host-side runtime (Engine, EngineView, etc.)
-├── sdk               # Guest-side SDK (runs in sandbox)
-└── types             # TypeScript type definitions
+rill/
+├── (default)       # Host runtime (Engine, EngineView, Receiver)
+├── /let            # Guest SDK (components, hooks)
+├── /devtools       # Development tools
+├── /sandbox        # Sandbox providers
+├── /sandbox-native # Native sandbox (JSC/QuickJS)
+├── /sandbox-web    # Web sandbox (Worker)
+└── /cli            # CLI build tools
 ```
-
-**Package Exports**:
-- `@rill/core` - Host runtime (Engine, EngineView, Receiver, Performance utils, etc.)
-- `@rill/core/sdk` - Guest SDK (Virtual components, Hooks, Error boundary)
-- `@rill/core/types` - Type definitions
-- `@rill/cli` - CLI tools for building bundles
 
 ---
 
-## SDK (@rill/core/sdk)
+## Guest SDK (rill/let)
 
-SDK used by guest developers, runs in the QuickJS sandbox.
+SDK used by guest developers, runs in the sandbox environment.
 
 ### Virtual Components
 
 Virtual components are string identifiers that are transformed into operation instructions during bundling.
 
 ```tsx
-import { View, Text, Image, ScrollView, TouchableOpacity, TextInput, FlatList, Button, Switch, ActivityIndicator } from '@rill/core/sdk';
+import { View, Text, Image, ScrollView, TouchableOpacity, TextInput, FlatList, Button, Switch, ActivityIndicator } from 'rill/let';
 ```
 
 #### View
@@ -120,8 +118,6 @@ Scrollable container.
 | showsVerticalScrollIndicator | boolean | Show vertical scroll indicator |
 | showsHorizontalScrollIndicator | boolean | Show horizontal scroll indicator |
 | onScroll | (event: ScrollEvent) => void | Scroll callback |
-| onScrollBeginDrag | () => void | Begin drag callback |
-| onScrollEndDrag | () => void | End drag callback |
 
 #### FlatList
 
@@ -141,10 +137,6 @@ High-performance list component.
 | renderItem | (info: { item: T; index: number }) => ReactElement | Render function |
 | keyExtractor | (item: T, index: number) => string | Key extractor function |
 | horizontal | boolean | Whether horizontal layout |
-| ItemSeparatorComponent | ComponentType | Separator component |
-| ListHeaderComponent | ReactElement | Header component |
-| ListFooterComponent | ReactElement | Footer component |
-| ListEmptyComponent | ReactElement | Empty list component |
 | onEndReached | () => void | End reached callback |
 | onEndReachedThreshold | number | Trigger threshold |
 
@@ -166,15 +158,9 @@ Text input component.
 | value | string | Text value |
 | onChangeText | (text: string) => void | Text change callback |
 | placeholder | string | Placeholder text |
-| keyboardType | 'default' \| 'numeric' \| 'email-address' \| 'phone-pad' | Keyboard type |
 | secureTextEntry | boolean | Password mode |
 | multiline | boolean | Multi-line input |
 | maxLength | number | Maximum length |
-| autoFocus | boolean | Auto focus |
-| editable | boolean | Whether editable |
-| onFocus | () => void | Focus callback |
-| onBlur | () => void | Blur callback |
-| onSubmitEditing | () => void | Submit callback |
 
 #### Button
 
@@ -204,8 +190,6 @@ Switch component.
 | value | boolean | Current value |
 | onValueChange | (value: boolean) => void | Value change callback |
 | disabled | boolean | Whether disabled |
-| trackColor | { false: string; true: string } | Track color |
-| thumbColor | string | Thumb color |
 
 #### ActivityIndicator
 
@@ -230,7 +214,7 @@ Loading indicator.
 Listen to host events.
 
 ```tsx
-import { useHostEvent } from '@rill/core/sdk';
+import { useHostEvent } from 'rill/let';
 
 function Guest() {
   useHostEvent<{ force: boolean }>('REFRESH', (payload) => {
@@ -251,7 +235,7 @@ function Guest() {
 Get initial configuration.
 
 ```tsx
-import { useConfig } from '@rill/core/sdk';
+import { useConfig } from 'rill/let';
 
 interface Config {
   theme: 'light' | 'dark';
@@ -274,7 +258,7 @@ function Guest() {
 Send events to host.
 
 ```tsx
-import { useSendToHost } from '@rill/core/sdk';
+import { useSendToHost } from 'rill/let';
 
 function Guest() {
   const sendToHost = useSendToHost();
@@ -291,9 +275,82 @@ function Guest() {
 |--------------|------|-------------|
 | sendToHost | (eventName: string, payload?: unknown) => void | Send function |
 
+#### useRemoteRef
+
+Create a remote ref for calling Host component instance methods.
+
+```tsx
+import { useRemoteRef, TextInput, TextInputRef } from 'rill/let';
+
+function Guest() {
+  const [inputRef, remoteInput] = useRemoteRef<TextInputRef>();
+
+  const handleFocus = async () => {
+    await remoteInput?.invoke('focus');
+  };
+
+  return (
+    <View>
+      <TextInput ref={inputRef} placeholder="Enter text" />
+      <TouchableOpacity onPress={handleFocus}>
+        <Text>Focus Input</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+```
+
+| Return Value | Type | Description |
+|--------------|------|-------------|
+| refCallback | RemoteRefCallback | Callback to pass to component ref prop |
+| remoteRef | RemoteRef\<T\> \| null | Remote ref object (available after mount) |
+
+**RemoteRef Interface:**
+
+| Property/Method | Type | Description |
+|-----------------|------|-------------|
+| nodeId | number | Node ID |
+| invoke | (method: string, ...args: unknown[]) => Promise\<R\> | Call remote method |
+| call | Proxy | Type-safe method proxy |
+
+**Predefined Ref Types:**
+
+- `TextInputRef`: `focus()`, `blur()`, `clear()`
+- `ScrollViewRef`: `scrollTo()`, `scrollToEnd()`
+- `FlatListRef`: `scrollToIndex()`, `scrollToOffset()`
+
 ---
 
-## Runtime (@rill/core)
+### RillErrorBoundary
+
+Guest-side error boundary component for catching render errors.
+
+```tsx
+import { RillErrorBoundary, View, Text } from 'rill/let';
+
+function App() {
+  return (
+    <RillErrorBoundary
+      fallback={<Text>An error occurred</Text>}
+      onError={(error, info) => {
+        console.error('Render error:', error, info.componentStack);
+      }}
+    >
+      <MyComponent />
+    </RillErrorBoundary>
+  );
+}
+```
+
+| Property | Type | Description |
+|----------|------|-------------|
+| children | ReactNode | Child components |
+| fallback | ReactNode \| ((error, info) => ReactNode) | Content to show on error |
+| onError | (error: Error, info: ErrorInfo) => void | Error callback |
+
+---
+
+## Host Runtime (rill)
 
 Host-side runtime, responsible for sandbox execution and UI rendering.
 
@@ -302,12 +359,11 @@ Host-side runtime, responsible for sandbox execution and UI rendering.
 Sandbox engine, manages JS sandbox execution environment.
 
 ```tsx
-import { Engine } from '@rill/core';
+import { Engine } from 'rill';
 
 const engine = new Engine({
   timeout: 5000,
   debug: true,
-  logger: customLogger,
 });
 
 // Register custom components
@@ -325,26 +381,14 @@ await engine.loadBundle('https://cdn.example.com/guest.js', {
 // Listen to events
 engine.on('load', () => console.log('Guest loaded'));
 engine.on('error', (error) => console.error('Guest error:', error));
-engine.on('fatalError', (error) => console.error('Fatal error - engine destroyed:', error));
-engine.on('operation', (batch) => console.log('Operations:', batch));
 engine.on('message', (msg) => console.log('Guest message:', msg));
 engine.on('destroy', () => console.log('Guest destroyed'));
 
 // Send events to sandbox
 engine.sendEvent('REFRESH', { force: true });
 
-// Update configuration
-engine.updateConfig({ theme: 'light' });
-
-// Monitor resources
-const stats = engine.getResourceStats();
-console.log(`Resources: ${stats.timers} timers, ${stats.nodes} nodes, ${stats.callbacks} callbacks`);
-
 // Health check
 const health = engine.getHealth();
-
-// Memory leak detection
-engine.setMaxListeners(20);
 
 // Destroy engine
 engine.destroy();
@@ -354,7 +398,6 @@ engine.destroy();
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| sandbox | 'vm' \| 'worker' \| 'none' | auto-detect | Sandbox mode |
 | provider | JSEngineProvider | auto | Custom JS engine provider |
 | timeout | number | 5000 | Execution timeout (ms) |
 | debug | boolean | false | Debug mode |
@@ -371,12 +414,8 @@ engine.destroy();
 | loadBundle | source: string, props?: object | Promise\<void\> | Load and execute guest bundle |
 | sendEvent | eventName: string, payload?: unknown | void | Send event to guest |
 | updateConfig | config: object | void | Update guest configuration |
-| on | event: keyof EngineEvents, handler: Function | () => void | Subscribe to engine event, returns unsubscribe function |
-| getResourceStats | - | ResourceStats | Get resource usage statistics |
+| on | event: keyof EngineEvents, handler: Function | () => void | Subscribe to engine event |
 | getHealth | - | EngineHealth | Get engine health status |
-| setMaxListeners | n: number | void | Set max event listeners threshold |
-| getMaxListeners | - | number | Get max event listeners threshold |
-| createReceiver | registry: ComponentRegistry | Receiver | Create operation receiver |
 | getReceiver | - | Receiver \| null | Get current receiver |
 | getRegistry | - | ComponentRegistry | Get component registry |
 | destroy | - | void | Destroy engine and release all resources |
@@ -394,20 +433,22 @@ engine.destroy();
 React Native component for rendering engine output.
 
 ```tsx
-import { EngineView } from '@rill/core';
+import { Engine, EngineView } from 'rill';
 
 function GuestContainer() {
-  const engine = new Engine();
-  engine.register({ StepList: NativeStepList });
+  const engine = useMemo(() => new Engine({ debug: __DEV__ }), []);
+
+  useEffect(() => {
+    engine.register({ StepList: NativeStepList });
+  }, [engine]);
 
   return (
     <EngineView
       engine={engine}
-      bundleUrl="https://cdn.example.com/bundle.js"
+      source="https://cdn.example.com/bundle.js"
       initialProps={{ theme: 'dark' }}
       onLoad={() => console.log('Bundle loaded')}
       onError={(err) => console.error('Bundle error:', err)}
-      onDestroy={() => console.log('Engine destroyed')}
       fallback={<ActivityIndicator />}
       renderError={(error) => <Text>Error: {error.message}</Text>}
       style={{ flex: 1 }}
@@ -421,7 +462,7 @@ function GuestContainer() {
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
 | engine | Engine | Yes | Engine instance |
-| bundleUrl | string | Yes | Bundle source (URL or code string) |
+| source | string | Yes | Bundle source (URL or code string) |
 | initialProps | Record<string, unknown> | No | Initial props to pass to the Guest |
 | onLoad | () => void | No | Load complete callback |
 | onError | (error: Error) => void | No | Error callback |
@@ -435,16 +476,8 @@ function GuestContainer() {
 Component registry, manages component whitelist.
 
 ```tsx
-import { ComponentRegistry, createRegistry } from '@rill/core';
+import { ComponentRegistry, createRegistry } from 'rill';
 
-// Use factory function
-const registry = createRegistry({
-  View: RNView,
-  Text: RNText,
-  Image: RNImage,
-});
-
-// Or use class
 const registry = new ComponentRegistry();
 registry.register('CustomCard', MyCard);
 registry.registerAll({ Header, Footer });
@@ -452,7 +485,6 @@ registry.registerAll({ Header, Footer });
 // Query components
 const Component = registry.get('View');
 const hasComponent = registry.has('CustomCard');
-const allNames = registry.getAll();
 ```
 
 ### Receiver
@@ -460,7 +492,7 @@ const allNames = registry.getAll();
 Operation receiver, parses operations and builds component tree.
 
 ```tsx
-import { Receiver } from '@rill/core';
+import { Receiver } from 'rill';
 
 const receiver = new Receiver(
   registry,
@@ -473,105 +505,25 @@ receiver.applyBatch(batch);
 
 // Render component tree
 const tree = receiver.render();
-
-// Get debug info
-const debugInfo = receiver.getDebugInfo();
 ```
 
 ---
 
-## Performance (rill/runtime)
+## DevTools (rill/devtools)
 
-Performance optimization tools.
-
-### ThrottledScheduler
-
-Throttled scheduler, controls update frequency.
-
-```tsx
-import { ThrottledScheduler } from '@rill/core';
-
-const scheduler = new ThrottledScheduler(
-  (batch) => receiver.applyBatch(batch),
-  {
-    maxBatchSize: 100,
-    throttleMs: 16,
-    enableMerge: true,
-  }
-);
-
-// Add operations
-scheduler.enqueue(operation);
-scheduler.enqueueAll(operations);
-
-// Flush immediately
-scheduler.flush();
-
-// Cleanup
-scheduler.dispose();
-```
-
-### VirtualScrollCalculator
-
-Virtual scroll calculator, optimizes long list rendering.
-
-```tsx
-import { VirtualScrollCalculator } from '@rill/core';
-
-const calculator = new VirtualScrollCalculator({
-  estimatedItemHeight: 50,
-  overscan: 5,
-  scrollThrottleMs: 16,
-});
-
-calculator.setTotalItems(1000);
-calculator.setItemHeight(0, 100); // Record actual height
-
-const state = calculator.calculate(scrollTop, viewportHeight);
-// state: { startIndex, endIndex, offsetTop, offsetBottom, visibleItems }
-```
-
-### PerformanceMonitor
-
-Performance monitor.
-
-```tsx
-import { PerformanceMonitor } from '@rill/core';
-
-const monitor = new PerformanceMonitor();
-
-monitor.recordBatch(batch, originalCount);
-
-const metrics = monitor.getMetrics();
-// metrics: {
-//   totalOperations, totalBatches, avgBatchSize,
-//   mergedOperations, createCount, updateCount, deleteCount
-// }
-
-monitor.reset();
-```
-
----
-
-## DevTools (@rill/devtools)
-
-Development and debugging tools for Rill applications. Provides operation logging, performance profiling, and error tracking.
-
-Guest-side data is automatically collected by:
-- **DEVTOOLS_SHIM** - Console/error interception (injected by Engine when `devtools: true`)
-- **Reconciler** - Render timing (integrated in @rill/let)
+Development and debugging tools for Rill applications.
 
 ### createDevTools
 
 Create a DevTools instance.
 
 ```tsx
-import { createDevTools } from '@rill/devtools';
+import { createDevTools } from 'rill/devtools';
 
 const devtools = createDevTools({
   runtime: {
-    maxLogs: 100,           // Max operation logs to keep
-    maxTimelineEvents: 500, // Max timeline events
+    maxLogs: 100,
+    maxTimelineEvents: 500,
   },
 });
 
@@ -579,12 +531,11 @@ const devtools = createDevTools({
 devtools.enable();
 devtools.disable();
 
-// Connect to engine (auto-subscribes to events)
+// Connect to engine
 devtools.connectEngine(engine);
 
 // Get component tree
 const tree = devtools.getHostTree();
-const treeText = devtools.getHostTreeText();
 
 // Export debug data
 const data = devtools.export();
@@ -593,123 +544,29 @@ const data = devtools.export();
 devtools.reset();
 ```
 
-### Event Subscription
-
-Subscribe to devtools events.
-
-```tsx
-// Available events: 'console', 'error', 'render', 'operation'
-devtools.subscribe('error', (event) => {
-  console.log('Guest error:', event.data);
-});
-
-devtools.subscribe('operation', (event) => {
-  console.log('Operations:', event.data);
-});
-```
-
-### Profiling
-
-Record and analyze performance.
-
-```tsx
-// Start profiling
-devtools.startProfiling();
-
-// ... user interactions ...
-
-// Stop and get report
-const report = devtools.stopProfiling();
-
-console.log(report.summary);
-// {
-//   totalOperations: 150,
-//   totalRenders: 25,
-//   avgOperationTime: 2.5,
-//   avgRenderTime: 8.3,
-//   slowestNodes: [...],
-//   errorCount: 0,
-// }
-```
-
-### Data Access
-
-Access collected debug data.
-
-```tsx
-// Host data
-const tree = devtools.getHostTree();        // Component tree
-const metrics = devtools.getHostMetrics();  // Performance metrics
-const status = devtools.getSandboxStatus(); // Sandbox state
-const logs = devtools.getOperationLogs();   // Operation history
-
-// Guest data
-const consoleLogs = devtools.getConsoleLogs(); // Console output
-const errors = devtools.getErrors();           // Errors
-const ready = devtools.isGuestReady();         // Guest ready state
-```
-
-### RuntimeCollector (Low-level)
-
-For direct integration without Engine connection.
-
-```tsx
-import { createRuntimeCollector } from '@rill/devtools';
-
-const collector = createRuntimeCollector({ maxLogs: 100 });
-collector.enable();
-
-// Log operations
-collector.logBatch(batch, duration);
-
-// Record events
-collector.recordCallback(fnId, args);
-collector.recordHostEvent(eventName, payload);
-
-// Build tree from node map
-const tree = collector.buildTree(nodeMap, rootChildren);
-
-// Get stats
-const stats = collector.getOperationStats();
-const timeline = collector.getTimeline();
-```
-
 ---
 
-## CLI (@rill/cli)
+## CLI (rill/cli)
 
 Command-line tool for building guest bundles.
-
-### Installation
-
-```bash
-# Install globally
-bun add -g @rill/cli
-
-# Or use in monorepo workspace
-bun add @rill/cli --dev
-```
 
 ### Build Command
 
 ```bash
 # Build guest bundle
-rill build src/guest.tsx -o dist/bundle.js
+bun run rill/cli build src/guest.tsx -o dist/bundle.js
 
 # Watch mode for development
-rill build src/guest.tsx --watch --no-minify --sourcemap
+bun run rill/cli build src/guest.tsx --watch --no-minify --sourcemap
 
-# Production build
-rill build src/guest.tsx -o dist/bundle.js --minify
-
-# Generate metafile for analysis
-rill build src/guest.tsx -o dist/bundle.js --metafile dist/meta.json
+# Analyze bundle
+bun run rill/cli analyze dist/bundle.js
 ```
 
 ### Programmatic Interface
 
 ```tsx
-import { build } from '@rill/cli';
+import { build, analyze } from 'rill/cli';
 
 await build({
   entry: 'src/guest.tsx',
@@ -717,7 +574,12 @@ await build({
   minify: true,
   sourcemap: false,
   watch: false,
-  metafile: 'dist/meta.json',
+  strict: true,  // Enable strict dependency guard (default)
+});
+
+await analyze('dist/bundle.js', {
+  whitelist: ['react', 'react-native', 'react/jsx-runtime', '@rill/let'],
+  failOnViolation: true,
 });
 ```
 
@@ -725,27 +587,79 @@ await build({
 
 ## Type Definitions
 
-### Operation
+### EngineOptions
 
-Operation instruction types.
+```typescript
+interface EngineOptions {
+  provider?: JSEngineProvider;          // Custom provider
+  timeout?: number;                     // Execution timeout (default 5000ms)
+  debug?: boolean;                      // Debug mode
+  logger?: {
+    log: (...args: unknown[]) => void;
+    warn: (...args: unknown[]) => void;
+    error: (...args: unknown[]) => void;
+  };
+  onMetric?: (name: string, value: number, extra?: Record<string, unknown>) => void;
+  requireWhitelist?: string[];          // Allowed require() modules
+  receiverMaxBatchSize?: number;        // Max operations per batch (default 5000)
+}
+```
+
+### EngineEvents
+
+```typescript
+interface EngineEvents {
+  load: () => void;                      // Bundle loaded successfully
+  error: (error: Error) => void;         // Guest runtime error
+  fatalError: (error: Error) => void;    // Fatal error - engine auto-destroyed
+  destroy: () => void;                   // Engine destroyed
+  operation: (batch: OperationBatch) => void;  // Operation batch received
+  message: (message: GuestMessage) => void;    // Guest message received
+}
+```
+
+### EngineHealth
+
+```typescript
+interface EngineHealth {
+  loaded: boolean;         // Whether bundle is loaded
+  destroyed: boolean;      // Whether engine is destroyed
+  errorCount: number;      // Total error count
+  lastErrorAt: number | null;  // Last error timestamp
+  receiverNodes: number;   // Node count in receiver
+  batching: boolean;       // Whether batching is active
+}
+```
+
+### OperationBatch
+
+```typescript
+interface OperationBatch {
+  version: number;          // Protocol version
+  batchId: number;          // Batch identifier
+  operations: Operation[];  // Array of operations
+}
+```
+
+### Operation Types
 
 ```typescript
 type OperationType =
-  | 'CREATE'
-  | 'UPDATE'
-  | 'DELETE'
-  | 'APPEND'
-  | 'INSERT'
-  | 'REMOVE'
-  | 'REORDER'
-  | 'TEXT';
+  | 'CREATE'    // Create new node
+  | 'UPDATE'    // Update node props
+  | 'DELETE'    // Delete node
+  | 'APPEND'    // Append child
+  | 'INSERT'    // Insert child at index
+  | 'REMOVE'    // Remove child
+  | 'REORDER'   // Reorder children
+  | 'TEXT'      // Update text content
+  | 'REF_CALL'; // Remote method call (Remote Ref)
 
 interface CreateOperation {
   op: 'CREATE';
   id: number;
   type: string;
   props: SerializedProps;
-  timestamp?: number;
 }
 
 interface UpdateOperation {
@@ -753,96 +667,39 @@ interface UpdateOperation {
   id: number;
   props: SerializedProps;
   removedProps?: string[];
-  timestamp?: number;
 }
 
-interface DeleteOperation {
-  op: 'DELETE';
-  id: number;
-  timestamp?: number;
-}
-
-// ... more operation types
+// ... other operation types
 ```
 
-### OperationBatch
-
-Operation batch.
-
-```typescript
-interface OperationBatch {
-  version: number;
-  batchId: number;
-  operations: Operation[];
-}
-```
-
-### HostMessage
-
-Host message types.
+### HostMessage Types
 
 ```typescript
 type HostMessageType =
-  | 'CALL_FUNCTION'
-  | 'HOST_EVENT'
-  | 'CONFIG_UPDATE'
-  | 'DESTROY';
-
-interface CallFunctionMessage {
-  type: 'CALL_FUNCTION';
-  fnId: string;
-  args: unknown[];
-}
-
-interface HostEventMessage {
-  type: 'HOST_EVENT';
-  eventName: string;
-  payload: unknown;
-}
-
-// ... more message types
+  | 'CALL_FUNCTION'      // Call callback function
+  | 'HOST_EVENT'         // Host event broadcast
+  | 'CONFIG_UPDATE'      // Configuration update
+  | 'DESTROY'            // Destroy signal
+  | 'REF_METHOD_RESULT'; // Remote Ref method call result
 ```
 
-### StyleProp
-
-Style types.
+### JSEngineProvider
 
 ```typescript
-interface StyleObject {
-  // Layout
-  flex?: number;
-  flexDirection?: 'row' | 'column' | 'row-reverse' | 'column-reverse';
-  justifyContent?: 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'space-evenly';
-  alignItems?: 'flex-start' | 'flex-end' | 'center' | 'stretch' | 'baseline';
-
-  // Size
-  width?: number | string;
-  height?: number | string;
-  minWidth?: number | string;
-  maxWidth?: number | string;
-
-  // Spacing
-  margin?: number;
-  padding?: number;
-
-  // Border
-  borderWidth?: number;
-  borderColor?: string;
-  borderRadius?: number;
-
-  // Background
-  backgroundColor?: string;
-
-  // Text
-  color?: string;
-  fontSize?: number;
-  fontWeight?: 'normal' | 'bold' | '100' | '200' | ... | '900';
-  textAlign?: 'auto' | 'left' | 'right' | 'center' | 'justify';
-
-  // ... more style properties
+interface JSEngineProvider {
+  createRuntime(): Promise<JSEngineRuntime>;
 }
 
-type StyleProp = StyleObject | StyleObject[] | null | undefined;
+interface JSEngineRuntime {
+  createContext(): Promise<JSEngineContext>;
+}
+
+interface JSEngineContext {
+  eval(code: string): Promise<unknown>;
+  set(name: string, value: unknown): void;
+  get(name: string): unknown;
+  dispose(): void;
+}
 ```
 
 ---
@@ -884,33 +741,14 @@ Only register necessary components:
 
 ```tsx
 engine.register({
-  // Only register needed components
   Card: MyCard,
   Badge: MyBadge,
 });
 ```
 
-### 2. Performance Optimization
+### 2. Debugging
 
 ```tsx
-// Use throttled scheduler
-const scheduler = new ThrottledScheduler(onBatch, {
-  maxBatchSize: 50,
-  throttleMs: 16,
-  enableMerge: true,
-});
-
-// Use virtual scrolling for long lists
-const calculator = new VirtualScrollCalculator({
-  estimatedItemHeight: 60,
-  overscan: 3,
-});
-```
-
-### 3. Debugging
-
-```tsx
-// Monitor engine events
 engine.on('error', (error) => {
   console.error('[Guest Error]', error);
   reportError(error);
@@ -919,160 +757,17 @@ engine.on('error', (error) => {
 engine.on('operation', (batch) => {
   console.log(`Operations: ${batch.operations.length}`);
 });
-
-// Check resource usage
-const stats = engine.getResourceStats();
-if (stats.callbacks > 1000) {
-  console.warn('High callback count detected:', stats);
-}
 ```
 
-### 4. Error Boundaries
+### 3. Error Boundaries
 
 ```tsx
 <EngineView
   engine={engine}
-  bundleUrl={bundleUrl}
+  source={bundleUrl}
   onError={(error) => {
     reportError(error);
   }}
   renderError={(error) => <ErrorFallback error={error} />}
 />
-```
-
----
-
-## Type Definitions
-
-### EngineOptions
-
-```typescript
-interface EngineOptions {
-  sandbox?: 'vm' | 'worker' | 'none';  // Sandbox mode (auto-detected if not set)
-  provider?: JSEngineProvider;          // Custom provider
-  timeout?: number;                     // Execution timeout (default 5000ms)
-  debug?: boolean;                      // Debug mode
-  logger?: {                            // Custom logger
-    log: (...args: unknown[]) => void;
-    warn: (...args: unknown[]) => void;
-    error: (...args: unknown[]) => void;
-  };
-  onMetric?: (name: string, value: number, extra?: Record<string, unknown>) => void;
-  requireWhitelist?: string[];          // Allowed require() modules
-  receiverMaxBatchSize?: number;        // Max operations per batch (default 5000)
-}
-```
-
-### EngineEvents
-
-```typescript
-interface EngineEvents {
-  load: () => void;                      // Bundle loaded successfully
-  error: (error: Error) => void;         // Guest runtime error
-  fatalError: (error: Error) => void;    // Fatal error - engine auto-destroyed
-  destroy: () => void;                   // Engine destroyed
-  operation: (batch: OperationBatch) => void;  // Operation batch received
-  message: (message: GuestMessage) => void;    // Guest message received
-}
-```
-
-### ResourceStats
-
-```typescript
-interface ResourceStats {
-  timers: number;     // Active setTimeout/setInterval count
-  nodes: number;      // VNode count in component tree
-  callbacks: number;  // Registered callback functions count
-}
-```
-
-### EngineHealth
-
-```typescript
-interface EngineHealth {
-  loaded: boolean;         // Whether bundle is loaded
-  destroyed: boolean;      // Whether engine is destroyed
-  errorCount: number;      // Total error count
-  lastErrorAt: number | null;  // Last error timestamp
-  receiverNodes: number;   // Node count in receiver
-  batching: boolean;       // Whether batching is active
-}
-```
-
-### GuestMessage
-
-```typescript
-interface GuestMessage {
-  event: string;    // Event name
-  payload: unknown; // Event payload
-}
-```
-
-### OperationBatch
-
-```typescript
-interface OperationBatch {
-  version: number;          // Protocol version
-  batchId: number;          // Batch identifier
-  operations: Operation[];  // Array of operations
-}
-```
-
-### Operation Types
-
-```typescript
-type OperationType =
-  | 'CREATE'   // Create new node
-  | 'UPDATE'   // Update node props
-  | 'DELETE'   // Delete node
-  | 'APPEND'   // Append child
-  | 'INSERT'   // Insert child at index
-  | 'REMOVE'   // Remove child
-  | 'REORDER'  // Reorder children
-  | 'TEXT';    // Update text content
-
-interface CreateOperation {
-  op: 'CREATE';
-  id: number;
-  type: string;
-  props: SerializedProps;
-}
-
-interface UpdateOperation {
-  op: 'UPDATE';
-  id: number;
-  props: SerializedProps;
-  removedProps?: string[];
-}
-
-interface AppendOperation {
-  op: 'APPEND';
-  id: number;
-  parentId: number;
-  childId: number;
-}
-
-// ... other operation types
-```
-
-### ComponentMap
-
-```typescript
-type ComponentMap = Record<string, React.ComponentType<any>>;
-```
-
-### JSEngineProvider
-
-```typescript
-interface JSEngineProvider {
-  createEngine(): JSEngine;
-  supportsWorker?: boolean;
-}
-
-interface JSEngine {
-  evaluate(code: string): unknown;
-  set(name: string, value: unknown): void;
-  get(name: string): unknown;
-  dispose(): void;
-}
 ```

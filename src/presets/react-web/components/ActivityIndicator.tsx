@@ -4,7 +4,7 @@
  * CSS spinner animation
  */
 
-import React from 'react';
+import type React from 'react';
 
 export interface ActivityIndicatorProps {
   size?: 'small' | 'large' | number;

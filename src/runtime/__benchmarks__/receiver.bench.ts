@@ -54,9 +54,7 @@ describe('Receiver Benchmarks', () => {
 
   afterEach(() => {
     receiver.clear();
-  });
 
-  afterEach(() => {
     if (results.length > 0) {
       console.log(`\n${'='.repeat(80)}`);
       console.log('RECEIVER BENCHMARK RESULTS');

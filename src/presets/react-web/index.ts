@@ -4,18 +4,20 @@
  * React Web preset for rill - default components and EngineView for browsers
  */
 
-// EngineView component
-export type { EngineViewProps } from './EngineView';
-export { EngineView } from './EngineView';
-
+// Re-export runtime types for convenience
+export type {
+  ComponentMap,
+  ComponentRegistry,
+  ComponentType,
+  Engine,
+  EngineOptions,
+} from '@rill/runtime';
 // Default components for React Web
-export type { DefaultComponentName } from './components';
-export { DefaultComponents } from './components';
-
 // Individual component exports
 export type {
   ActivityIndicatorProps,
   ButtonProps,
+  DefaultComponentName,
   FlatListProps,
   ImageProps,
   ImageSource,
@@ -27,10 +29,10 @@ export type {
   TouchableOpacityProps,
   ViewProps,
 } from './components';
-
 export {
   ActivityIndicator,
   Button,
+  DefaultComponents,
   FlatList,
   Image,
   ScrollView,
@@ -40,12 +42,6 @@ export {
   TouchableOpacity,
   View,
 } from './components';
-
-// Re-export runtime types for convenience
-export type {
-  Engine,
-  EngineOptions,
-  ComponentMap,
-  ComponentRegistry,
-  ComponentType,
-} from '@rill/runtime';
+// EngineView component
+export type { EngineViewProps } from './EngineView';
+export { EngineView } from './EngineView';
