@@ -4,9 +4,9 @@
  * React Web component for rendering Guest UI in sandbox
  */
 
-import type { Engine } from '@rill/runtime';
-import { useEngineView } from '@rill/runtime';
 import type { ReactElement, ReactNode } from 'react';
+import type { Engine } from '../../host';
+import { useEngineView } from '../../host';
 
 /**
  * EngineView Props
