@@ -23,10 +23,12 @@ import * as ReactJSXRuntime from 'react/jsx-runtime';
 import {
   getCallbackCount,
   invokeCallback,
+  registerComponentType,
   releaseCallback,
   render,
   unmount,
   unmountAll,
+  unregisterComponentTypes,
 } from './reconciler';
 
 // NOTE: We do NOT export React to globalThis here because:
@@ -48,6 +50,9 @@ import {
   invokeCallback,
   releaseCallback,
   getCallbackCount,
+  // Component type registration - used by shims for JSI-safe function transport
+  registerComponentType,
+  unregisterComponentTypes,
 };
 
 // Log for debugging
