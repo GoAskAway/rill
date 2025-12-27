@@ -58,7 +58,7 @@ export const createElement: CreateElement = <P extends RillProps>(
   if (children.length > 0) {
     // createElement(type, props, child1, child2, ...)
     finalChildren = children.length === 1 ? children[0] : children;
-  } else if (props !== null && 'children' in props) {
+  } else if (props != null && 'children' in props) {
     // jsx/jsxs(type, { children: [...], ...props })
     const propsChildren = props.children;
     if (propsChildren !== undefined) {
@@ -68,7 +68,7 @@ export const createElement: CreateElement = <P extends RillProps>(
 
   // Build props without the children property (we set it explicitly)
   const propsWithoutChildren: Record<string, unknown> = {};
-  if (props !== null) {
+  if (props != null) {
     for (const key of Object.keys(props)) {
       if (key !== 'children') {
         propsWithoutChildren[key] = props[key as keyof P];

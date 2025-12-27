@@ -172,6 +172,7 @@ export function setScheduleRender(fn: ScheduleRender): void {
 
 /**
  * Schedule a re-render
+ * Uses globalThis.__rill_schedule_render which is set by Host
  */
 export function scheduleRender(): void {
   if (hooksState.isRendering) return;
@@ -184,10 +185,15 @@ export function scheduleRender(): void {
   }
 
   try {
-    if (externalScheduleRender !== null) {
+    // First try the Host-set global (primary path)
+    const hostScheduler = (globalThis as Record<string, unknown>).__rill_schedule_render;
+    if (typeof hostScheduler === 'function') {
+      hostScheduler();
+    } else if (externalScheduleRender !== null) {
+      // Fallback to externally set scheduler
       externalScheduleRender();
     } else {
-      console.warn('[rill:shim] scheduleRender: no external scheduler set');
+      console.warn('[rill:shim] scheduleRender: no scheduler available');
     }
   } finally {
     hooksState.isRendering = false;
