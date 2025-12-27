@@ -98,3 +98,73 @@ export {
   useRef,
   useState,
 };
+
+// Default export for `import React from 'react'`
+export default React;
+
+// Extend React object with namespace types for `React.ReactNode` style access
+// biome-ignore lint/suspicious/noExplicitAny: Namespace type extensions
+(React as any).ReactNode = undefined; // Type marker only
+// biome-ignore lint/suspicious/noExplicitAny: Namespace type extensions
+(React as any).ReactElement = undefined; // Type marker only
+// biome-ignore lint/suspicious/noExplicitAny: Namespace type extensions
+(React as any).FC = undefined; // Type marker only
+// biome-ignore lint/suspicious/noExplicitAny: Namespace type extensions
+(React as any).ElementType = undefined; // Type marker only
+// biome-ignore lint/suspicious/noExplicitAny: Namespace type extensions
+(React as any).Key = undefined; // Type marker only
+
+// Declare React namespace for TypeScript
+declare namespace React {
+  // biome-ignore lint/suspicious/noExplicitAny: Namespace type
+  type ReactNode = any;
+  // biome-ignore lint/suspicious/noExplicitAny: Namespace type
+  type ReactElement<P = any> = any;
+  // biome-ignore lint/suspicious/noExplicitAny: Namespace type
+  type FC<P = any> = (props: P) => ReactElement | null;
+  // biome-ignore lint/suspicious/noExplicitAny: Namespace type
+  type ElementType<P = any> = any;
+  type Key = string | number | bigint;
+}
+
+// ============================================
+// Type exports for TypeScript compatibility
+// ============================================
+
+// Use permissive types to avoid conflicts with internal Rill types
+// These are used when counterapp imports from 'react' (mapped to this shim)
+
+/** React element type (permissive for rill internal compatibility) */
+// biome-ignore lint/suspicious/noExplicitAny: Permissive type for compatibility
+export type ReactElement<P = any> = {
+  // biome-ignore lint/suspicious/noExplicitAny: Permissive type for compatibility
+  type: any;
+  props: P;
+  // biome-ignore lint/suspicious/noExplicitAny: Permissive type for compatibility
+  key?: any;
+  // biome-ignore lint/suspicious/noExplicitAny: Permissive type for compatibility
+  [key: string]: any; // Allow any additional properties
+};
+
+/** React node type (anything renderable) */
+// biome-ignore lint/suspicious/noExplicitAny: Permissive type for compatibility
+export type ReactNode = any;
+
+/** Function component type */
+// biome-ignore lint/suspicious/noExplicitAny: Permissive type for compatibility
+export type FC<P = any> = (props: P) => ReactElement | null;
+
+/** Component type (function or class) */
+// biome-ignore lint/suspicious/noExplicitAny: Permissive type for compatibility
+export type ComponentType<P = any> = FC<P> | typeof Component;
+
+/** Key type */
+export type Key = string | number | bigint;
+
+/** Element type */
+// biome-ignore lint/suspicious/noExplicitAny: Permissive type for compatibility
+export type ElementType<P = any> = string | FC<P> | ComponentType<P>;
+
+/** Ref types */
+export type Ref<T> = { current: T | null } | ((instance: T | null) => void) | null;
+export type RefObject<T> = { current: T | null };
