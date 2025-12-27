@@ -21,13 +21,91 @@ import {
 import { Children, cloneElement, createElement, Fragment, isValidElement } from './react-core';
 
 // ============================================
+// React Internals for react-reconciler compatibility
+// ============================================
+// react-reconciler accesses React.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE
+// We provide a minimal implementation of the Scheduler (S) property
+
+// Scheduler priority constants
+const ImmediatePriority = 1;
+const UserBlockingPriority = 2;
+const NormalPriority = 3;
+const LowPriority = 4;
+const IdlePriority = 5;
+
+// Minimal scheduler implementation for react-reconciler
+// biome-ignore lint/suspicious/noExplicitAny: React internals require any
+const MinimalScheduler: any = {
+  unstable_ImmediatePriority: ImmediatePriority,
+  unstable_UserBlockingPriority: UserBlockingPriority,
+  unstable_NormalPriority: NormalPriority,
+  unstable_LowPriority: LowPriority,
+  unstable_IdlePriority: IdlePriority,
+
+  unstable_now: () => performance?.now?.() ?? Date.now(),
+
+  // biome-ignore lint/suspicious/noExplicitAny: Scheduler callback type
+  unstable_scheduleCallback: (priority: number, callback: any) => {
+    // Use setTimeout for scheduling in sandbox environment
+    const timeoutId = setTimeout(() => {
+      try {
+        callback();
+      } catch (e) {
+        console.error('[rill:scheduler] Callback error:', e);
+      }
+    }, 0);
+    return { id: timeoutId };
+  },
+
+  // biome-ignore lint/suspicious/noExplicitAny: Scheduler task type
+  unstable_cancelCallback: (task: any) => {
+    if (task && task.id) {
+      clearTimeout(task.id);
+    }
+  },
+
+  unstable_shouldYield: () => false,
+
+  unstable_requestPaint: () => {},
+
+  unstable_getCurrentPriorityLevel: () => NormalPriority,
+
+  // biome-ignore lint/suspicious/noExplicitAny: Scheduler callback type
+  unstable_runWithPriority: (priority: number, callback: any) => callback(),
+
+  // biome-ignore lint/suspicious/noExplicitAny: Scheduler callback type
+  unstable_wrapCallback: (callback: any) => callback,
+
+  unstable_next: (callback: () => void) => callback(),
+
+  unstable_forceFrameRate: () => {},
+
+  unstable_Profiling: null,
+};
+
+// React 19 internals structure
+// react-reconciler accesses these properties directly on ReactSharedInternals
+// biome-ignore lint/suspicious/noExplicitAny: React internals
+const ReactSharedInternals: any = {
+  H: null, // ReactCurrentDispatcher (hooks)
+  A: null, // ReactCurrentActQueue
+  T: null, // ReactCurrentBatchConfig
+  S: MinimalScheduler, // Scheduler - required by react-reconciler
+  // react-reconciler checks `null !== ReactSharedInternals.actQueue` before using
+  // Setting to null prevents act() testing mode from being activated
+  actQueue: null,
+};
+
+// ============================================
 // React API Object
 // ============================================
 
 /**
  * Complete React API for sandbox environment
+ * Includes internals required by react-reconciler
  */
-export const React: RillReactAPI = {
+// biome-ignore lint/suspicious/noExplicitAny: React object needs internals attached
+export const React: RillReactAPI & Record<string, any> = {
   // Core
   createElement,
   Fragment,
@@ -51,6 +129,12 @@ export const React: RillReactAPI = {
   // Components
   Component,
   PureComponent,
+
+  // React internals for react-reconciler compatibility
+  // React 19 uses different property names in different versions
+  __CLIENT_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_WARNED: ReactSharedInternals,
+  __CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE: ReactSharedInternals,
+  __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: ReactSharedInternals,
 };
 
 // ============================================
@@ -97,6 +181,11 @@ export {
   useReducer,
   useRef,
   useState,
+  // Internals - exported for CommonJS wrapper compatibility
+  // react-reconciler accesses these via __toCommonJS(exports_react).__CLIENT_INTERNALS...
+  ReactSharedInternals as __CLIENT_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_WARNED,
+  ReactSharedInternals as __CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE,
+  ReactSharedInternals as __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED,
 };
 
 // Default export for `import React from 'react'`
