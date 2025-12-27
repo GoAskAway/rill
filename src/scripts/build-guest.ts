@@ -536,23 +536,101 @@ async function createDebugProject(appDir: string): Promise<string> {
   );
   console.log(`   Created: tsconfig.json`);
 
-  // Generate react-shim.ts with React namespace
+  // Generate react-shim.ts - completely standalone, no guest/ imports
   const reactShim = `
-// React shim for debug project
-export * from './guest/shims/react';
-import { React } from './guest/shims/react';
-export default React;
+// React shim for debug project (standalone - no guest/ imports)
+// This provides a minimal React implementation for typecheck purposes
 
-// Re-export React namespace types
-export type ReactElement = ReturnType<typeof React.createElement>;
-export type ReactNode = ReactElement | string | number | boolean | null | undefined;
+type Dispatch<A> = (value: A) => void;
+type SetStateAction<S> = S | ((prevState: S) => S);
 
-// React namespace for JSX
-declare namespace React {
-  type ReactElement = ReturnType<typeof import('./guest/shims/react').React.createElement>;
-  type ReactNode = ReactElement | string | number | boolean | null | undefined;
-  type FC<P = {}> = (props: P) => ReactElement | null;
+// Minimal hooks implementations (for typecheck, actual runtime uses guest/shims)
+export function useState<S>(initialState: S | (() => S)): [S, Dispatch<SetStateAction<S>>] {
+  return [typeof initialState === 'function' ? (initialState as () => S)() : initialState, () => {}];
 }
+
+export function useEffect(effect: () => void | (() => void), deps?: unknown[]): void {}
+export function useRef<T>(initialValue: T): { current: T } { return { current: initialValue }; }
+export function useMemo<T>(factory: () => T, deps: unknown[]): T { return factory(); }
+export function useCallback<T extends (...args: any[]) => any>(callback: T, deps: unknown[]): T { return callback; }
+export function useReducer<R extends (state: any, action: any) => any>(
+  reducer: R, initialState: Parameters<R>[0]
+): [Parameters<R>[0], Dispatch<Parameters<R>[1]>] { return [initialState, () => {}]; }
+export function useContext<T>(context: { _currentValue: T }): T { return context._currentValue; }
+export function useId(): string { return 'id'; }
+
+// Core React functions
+export const Fragment = Symbol.for('react.fragment');
+export function createElement(type: any, props: any, ...children: any[]): any {
+  return { type, props: { ...props, children }, key: props?.key ?? null };
+}
+export function isValidElement(object: any): boolean { return object?.type !== undefined; }
+export function cloneElement(element: any, props?: any, ...children: any[]): any {
+  return { ...element, props: { ...element.props, ...props, children: children.length ? children : element.props.children } };
+}
+
+// Children utilities
+export const Children = {
+  map: (children: any, fn: (child: any, index: number) => any) => {
+    if (children == null) return [];
+    if (Array.isArray(children)) return children.map(fn);
+    return [fn(children, 0)];
+  },
+  forEach: (children: any, fn: (child: any, index: number) => void) => {
+    if (children == null) return;
+    if (Array.isArray(children)) children.forEach(fn);
+    else fn(children, 0);
+  },
+  count: (children: any) => {
+    if (children == null) return 0;
+    if (Array.isArray(children)) return children.length;
+    return 1;
+  },
+  only: (children: any) => children,
+  toArray: (children: any) => Array.isArray(children) ? children : children == null ? [] : [children],
+};
+
+// Context
+export function createContext<T>(defaultValue: T): { Provider: any; Consumer: any; _currentValue: T } {
+  return {
+    Provider: ({ children }: any) => children,
+    Consumer: ({ children }: any) => children(defaultValue),
+    _currentValue: defaultValue,
+  };
+}
+
+// Component classes
+export class Component<P = {}, S = {}> {
+  props: P;
+  state: S;
+  constructor(props: P) { this.props = props; this.state = {} as S; }
+  setState(state: Partial<S> | ((prev: S) => Partial<S>)): void {}
+  forceUpdate(): void {}
+  render(): any { return null; }
+}
+export class PureComponent<P = {}, S = {}> extends Component<P, S> {}
+
+// React namespace object
+export const React = {
+  createElement,
+  Fragment,
+  isValidElement,
+  cloneElement,
+  Children,
+  useState,
+  useRef,
+  useMemo,
+  useCallback,
+  useReducer,
+  useId,
+  useEffect,
+  useContext,
+  createContext,
+  Component,
+  PureComponent,
+};
+
+export default React;
 `;
   fs.writeFileSync(path.join(debugDir, 'react-shim.ts'), reactShim);
   console.log(`   Created: react-shim.ts`);
@@ -571,7 +649,7 @@ export default function Reconciler(config: any): any {
   fs.writeFileSync(path.join(debugDir, 'react-reconciler-stub.ts'), reconcilerStub);
   console.log(`   Created: react-reconciler-stub.ts`);
 
-  // Generate global.d.ts with JSX namespace and Node globals
+  // Generate global.d.ts with JSX namespace, Node globals, and React types
   const globalDts = `
 // Global type declarations for debug project
 
@@ -604,12 +682,35 @@ declare namespace JSX {
   interface ElementChildrenAttribute { children: {}; }
 }
 
-// React namespace for type annotations
+// React namespace for type annotations (SDK uses these)
 declare namespace React {
-  type ReactElement = any;
-  type ReactNode = any;
+  // Element types
+  type ReactElement<P = any> = { type: any; props: P; key: Key | null };
+  type ReactNode = ReactElement | string | number | boolean | null | undefined | ReactNode[];
+
+  // Key type (used by SDK)
+  type Key = string | number;
+
+  // Component types
   type FC<P = {}> = (props: P) => ReactElement | null;
-  type ComponentType<P = {}> = FC<P>;
+  type ComponentType<P = {}> = FC<P> | ComponentClass<P>;
+  type ElementType = string | FC<any> | ComponentType<any>;
+
+  // Component class
+  interface ComponentClass<P = {}> {
+    new(props: P): Component<P>;
+  }
+
+  interface Component<P = {}, S = {}> {
+    props: P;
+    state: S;
+    setState(state: Partial<S>): void;
+    render(): ReactNode;
+  }
+
+  // Ref types
+  type Ref<T> = { current: T | null } | ((instance: T | null) => void) | null;
+  type RefObject<T> = { current: T | null };
 }
 `;
   fs.writeFileSync(path.join(debugDir, 'global.d.ts'), globalDts);
@@ -641,9 +742,9 @@ export const Panel = {
 //
 // This file imports all sources for unified debugging.
 // Open this project in VSCode and set breakpoints anywhere.
-
-// Guest Runtime
-import './guest/guest-bundle';
+//
+// Note: guest/ is symlinked for debugging but not imported here.
+// TypeScript paths map 'rill/let' -> './sdk/index.ts' for app imports.
 
 // App Sources
 ${imports}
