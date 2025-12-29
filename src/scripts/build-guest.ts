@@ -2,7 +2,7 @@
 /**
  * Guest Bundle Build Script
  *
- * Compiles the Guest bundle (React shims + Reconciler + Runtime helpers).
+ * Compiles the Guest bundle (React + Reconciler + Runtime helpers).
  *
  * Required output:
  *  - A TypeScript export file (for Engine to import): src/guest/build/bundle.ts
@@ -26,7 +26,8 @@ import * as path from 'path';
 
 const SCRIPTS_DIR = path.resolve(import.meta.dir);
 const GUEST_DIR = path.join(SCRIPTS_DIR, '..', 'guest');
-const INPUT = path.join(GUEST_DIR, 'guest-bundle.ts');
+const RUNTIME_DIR = path.join(GUEST_DIR, 'runtime');
+const INPUT = path.join(GUEST_DIR, 'bundle.ts');
 const OUTPUT_DIR = path.join(GUEST_DIR, 'build');
 const OUTPUT_JS = path.join(OUTPUT_DIR, 'guest-bundle.js');
 const OUTPUT_TS_MERGED = path.join(OUTPUT_DIR, 'guest-bundle.merged.ts');
@@ -44,17 +45,11 @@ const shouldWriteMergedTS = process.argv.includes('--write-merged');
  * Concatenates all source files in dependency order
  */
 async function generateMergedTS(): Promise<string> {
-  const files = [
+  // Files are relative to RUNTIME_DIR, except bundle.ts which is in GUEST_DIR
+  const runtimeFiles = [
     'init.ts',
     'globals-setup.ts',
     'types.ts',
-    'shims/react-core.ts',
-    'shims/hooks.ts',
-    'shims/context.ts',
-    'shims/component.ts',
-    'shims/react-native.ts',
-    'shims/react.ts',
-    'shims/jsx-runtime.ts',
     'reconciler/types.ts',
     'reconciler/operation-collector.ts',
     'reconciler/guest-encoder.ts',
@@ -63,8 +58,8 @@ async function generateMergedTS(): Promise<string> {
     'reconciler/devtools.ts',
     'reconciler/reconciler-manager.ts',
     'reconciler/index.ts',
-    'guest-bundle.ts',
   ];
+  const bundleFile = 'bundle.ts'; // In GUEST_DIR
 
   const header = `/**
  * Guest Bundle - Merged TypeScript Source
@@ -82,16 +77,28 @@ async function generateMergedTS(): Promise<string> {
 
   let merged = header;
 
-  for (const file of files) {
-    const filePath = path.join(GUEST_DIR, file);
+  // Add runtime files
+  for (const file of runtimeFiles) {
+    const filePath = path.join(RUNTIME_DIR, file);
     if (fs.existsSync(filePath)) {
       const content = await Bun.file(filePath).text();
       merged += `\n// ============================================\n`;
-      merged += `// FILE: ${file}\n`;
+      merged += `// FILE: runtime/${file}\n`;
       merged += `// ============================================\n\n`;
       merged += content;
       merged += '\n';
     }
+  }
+
+  // Add bundle.ts from GUEST_DIR
+  const bundlePath = path.join(GUEST_DIR, bundleFile);
+  if (fs.existsSync(bundlePath)) {
+    const content = await Bun.file(bundlePath).text();
+    merged += `\n// ============================================\n`;
+    merged += `// FILE: ${bundleFile}\n`;
+    merged += `// ============================================\n\n`;
+    merged += content;
+    merged += '\n';
   }
 
   return merged;
@@ -161,7 +168,7 @@ async function build(): Promise<void> {
  * Run: bun src/scripts/build-guest.ts
  *
  * This is the compiled Guest bundle that provides:
- * - React/JSX shims
+ * - React + JSX runtime
  * - Console setup
  * - Runtime helpers (event communication)
  * - RillReconciler (render, unmount, etc.)

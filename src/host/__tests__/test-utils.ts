@@ -49,13 +49,15 @@ export function createMockJSEngineProvider(): JSEngineProvider {
             // Wrap code to use sandboxed globalThis instead of real globalThis
             // This prevents Object.defineProperty(globalThis, ...) from polluting the host
             // Also shadow console to prevent test noise
+            // NOTE: We use `return eval(code)` to ensure expression results are returned,
+            // matching the behavior of real JSC eval() which returns the last expression's value
             const wrappedCode = `
               "use strict";
               // Shadow globalThis with our sandbox version
               var globalThis = arguments[arguments.length - 1];
               // Shadow console with silent version to prevent test output noise
               var console = arguments[arguments.length - 2];
-              ${code}
+              return eval(${JSON.stringify(code)});
             `;
 
             const fn = new Function(...globalNames, wrappedCode);

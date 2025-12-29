@@ -10,14 +10,14 @@ import { beforeAll, beforeEach, describe, expect, it, mock } from 'bun:test';
 describe('EngineView', () => {
   // Dynamic imports for test isolation
   let React: typeof import('react');
-  let EngineView: typeof import('../presets/react-native/EngineView').EngineView;
+  let EngineView: typeof import('./preset/EngineView').EngineView;
   let Engine: typeof import('./engine').Engine;
   let TestRenderer: typeof import('react-test-renderer');
   let act: typeof import('react-test-renderer').act;
 
   beforeAll(async () => {
     React = await import('react');
-    const engineViewModule = await import('../presets/react-native/EngineView');
+    const engineViewModule = await import('./preset/EngineView');
     EngineView = engineViewModule.EngineView;
     const engineModule = await import('./engine');
     Engine = engineModule.Engine;
