@@ -166,18 +166,18 @@ rill/let 是 Guest 端 SDK，提供与 react-native 兼容的组件和 API。
 
 | 类型 | 状态 | 说明 |
 |------|------|------|
-| `ViewStyle` | 🔜 待实现 | View 样式类型 |
-| `TextStyle` | 🔜 待实现 | Text 样式类型 |
-| `ImageStyle` | 🔜 待实现 | Image 样式类型 |
-| `FlexStyle` | 🔜 待实现 | Flex 布局样式 |
+| `ViewStyle` | ✅ 已实现 | View 样式类型 |
+| `TextStyle` | ✅ 已实现 | Text 样式类型 |
+| `ImageStyle` | ✅ 已实现 | Image 样式类型 |
+| `FlexStyle` | ✅ 已实现 | Flex 布局样式 |
 | `StyleProp<T>` | ✅ 已实现 | 样式属性类型 |
 
 ### Value Types
 
 | 类型 | 状态 | 说明 |
 |------|------|------|
-| `ColorValue` | 🔜 待实现 | 颜色值类型 |
-| `DimensionValue` | 🔜 待实现 | 尺寸值类型 |
+| `ColorValue` | ✅ 已实现 | 颜色值类型 |
+| `DimensionValue` | ✅ 已实现 | 尺寸值类型 |
 
 ### Event Types
 
@@ -185,8 +185,8 @@ rill/let 是 Guest 端 SDK，提供与 react-native 兼容的组件和 API。
 |------|------|------|
 | `LayoutEvent` | ✅ 已实现 | 布局变化事件 |
 | `ScrollEvent` | ✅ 已实现 | 滚动事件 |
-| `GestureResponderEvent` | 🔜 待实现 | 手势事件 |
-| `NativeSyntheticEvent<T>` | 🔜 待实现 | 原生合成事件 |
+| `GestureResponderEvent` | ✅ 已实现 | 手势事件 |
+| `NativeSyntheticEvent<T>` | ✅ 已实现 | 原生合成事件 |
 
 ### Component Props Types
 
@@ -214,7 +214,7 @@ rill/let 是 Guest 端 SDK，提供与 react-native 兼容的组件和 API。
 | Components | 18 | 0 | 4 | 0 |
 | Hooks | 4 | 2 | 0 | 0 |
 | APIs | 6 | 8 | 5 | 3 |
-| Types | 12 | 8 | 0 | 0 |
+| Types | 18 | 2 | 0 | 0 |
 
 ---
 

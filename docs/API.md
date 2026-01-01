@@ -9,7 +9,7 @@ Rill is a lightweight React Native dynamic UI rendering engine that allows runni
 ```
 rill/
 ├── (default)        # Host runtime (Engine, EngineView, Receiver)
-├── /sdk             # Guest SDK (components, hooks)
+├── /let             # Guest SDK (components, hooks)
 ├── /devtools        # Development tools
 ├── /sandbox         # Sandbox providers (auto-detect)
 ├── /sandbox/native  # Native sandbox (JSC/QuickJS)
@@ -17,11 +17,9 @@ rill/
 └── /cli             # CLI build tools
 ```
 
-> Note: `rill/let` is a deprecated alias for `rill/sdk`.
-
 ---
 
-## Guest SDK (rill/sdk)
+## Guest SDK (rill/let)
 
 SDK used by guest developers, runs in the sandbox environment.
 
@@ -30,7 +28,7 @@ SDK used by guest developers, runs in the sandbox environment.
 Virtual components are string identifiers that are transformed into operation instructions during bundling.
 
 ```tsx
-import { View, Text, Image, ScrollView, TouchableOpacity, TextInput, FlatList, Button, Switch, ActivityIndicator } from 'rill/sdk';
+import { View, Text, Image, ScrollView, TouchableOpacity, TextInput, FlatList, Button, Switch, ActivityIndicator } from 'rill/let';
 ```
 
 #### View
@@ -216,7 +214,7 @@ Loading indicator.
 Listen to host events.
 
 ```tsx
-import { useHostEvent } from 'rill/sdk';
+import { useHostEvent } from 'rill/let';
 
 function Guest() {
   useHostEvent<{ force: boolean }>('REFRESH', (payload) => {
@@ -237,7 +235,7 @@ function Guest() {
 Get initial configuration.
 
 ```tsx
-import { useConfig } from 'rill/sdk';
+import { useConfig } from 'rill/let';
 
 interface Config {
   theme: 'light' | 'dark';
@@ -260,7 +258,7 @@ function Guest() {
 Send events to host.
 
 ```tsx
-import { useSendToHost } from 'rill/sdk';
+import { useSendToHost } from 'rill/let';
 
 function Guest() {
   const sendToHost = useSendToHost();
@@ -282,7 +280,7 @@ function Guest() {
 Create a remote ref for calling Host component instance methods.
 
 ```tsx
-import { useRemoteRef, TextInput, TextInputRef } from 'rill/sdk';
+import { useRemoteRef, TextInput, TextInputRef } from 'rill/let';
 
 function Guest() {
   const [inputRef, remoteInput] = useRemoteRef<TextInputRef>();
@@ -328,7 +326,7 @@ function Guest() {
 Guest-side error boundary component for catching render errors.
 
 ```tsx
-import { RillErrorBoundary, View, Text } from 'rill/sdk';
+import { RillErrorBoundary, View, Text } from 'rill/let';
 
 function App() {
   return (
@@ -580,7 +578,7 @@ await build({
 });
 
 await analyze('dist/bundle.js', {
-  whitelist: ['react', 'react-native', 'react/jsx-runtime', 'rill/sdk'],
+  whitelist: ['react', 'react-native', 'react/jsx-runtime', 'rill/let'],
   failOnViolation: true,
 });
 ```
