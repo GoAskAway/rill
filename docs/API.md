@@ -19,7 +19,7 @@ rill/
 
 ---
 
-## Guest SDK (rill/let)
+## Guest SDK (rill/sdk)
 
 SDK used by guest developers, runs in the sandbox environment.
 
@@ -28,7 +28,7 @@ SDK used by guest developers, runs in the sandbox environment.
 Virtual components are string identifiers that are transformed into operation instructions during bundling.
 
 ```tsx
-import { View, Text, Image, ScrollView, TouchableOpacity, TextInput, FlatList, Button, Switch, ActivityIndicator } from 'rill/let';
+import { View, Text, Image, ScrollView, TouchableOpacity, TextInput, FlatList, Button, Switch, ActivityIndicator } from 'rill/sdk';
 ```
 
 #### View
@@ -214,7 +214,7 @@ Loading indicator.
 Listen to host events.
 
 ```tsx
-import { useHostEvent } from 'rill/let';
+import { useHostEvent } from 'rill/sdk';
 
 function Guest() {
   useHostEvent<{ force: boolean }>('REFRESH', (payload) => {
@@ -235,7 +235,7 @@ function Guest() {
 Get initial configuration.
 
 ```tsx
-import { useConfig } from 'rill/let';
+import { useConfig } from 'rill/sdk';
 
 interface Config {
   theme: 'light' | 'dark';
@@ -258,7 +258,7 @@ function Guest() {
 Send events to host.
 
 ```tsx
-import { useSendToHost } from 'rill/let';
+import { useSendToHost } from 'rill/sdk';
 
 function Guest() {
   const sendToHost = useSendToHost();
@@ -280,7 +280,7 @@ function Guest() {
 Create a remote ref for calling Host component instance methods.
 
 ```tsx
-import { useRemoteRef, TextInput, TextInputRef } from 'rill/let';
+import { useRemoteRef, TextInput, TextInputRef } from 'rill/sdk';
 
 function Guest() {
   const [inputRef, remoteInput] = useRemoteRef<TextInputRef>();
@@ -326,7 +326,7 @@ function Guest() {
 Guest-side error boundary component for catching render errors.
 
 ```tsx
-import { RillErrorBoundary, View, Text } from 'rill/let';
+import { RillErrorBoundary, View, Text } from 'rill/sdk';
 
 function App() {
   return (
@@ -554,13 +554,13 @@ Command-line tool for building guest bundles.
 
 ```bash
 # Build guest bundle
-bun run rill/cli build src/guest.tsx -o dist/bundle.js
+bunx rill build src/guest.tsx -o dist/bundle.js
 
 # Watch mode for development
-bun run rill/cli build src/guest.tsx --watch --no-minify --sourcemap
+bunx rill build src/guest.tsx --watch --no-minify --sourcemap
 
 # Analyze bundle
-bun run rill/cli analyze dist/bundle.js
+bunx rill analyze dist/bundle.js
 ```
 
 ### Programmatic Interface
@@ -578,7 +578,7 @@ await build({
 });
 
 await analyze('dist/bundle.js', {
-  whitelist: ['react', 'react-native', 'react/jsx-runtime', 'rill/let'],
+  whitelist: ['react', 'react-native', 'react/jsx-runtime', 'rill/sdk'],
   failOnViolation: true,
 });
 ```
@@ -696,11 +696,58 @@ interface JSEngineRuntime {
 
 interface JSEngineContext {
   eval(code: string): Promise<unknown>;
+  evalBytecode?(bytecode: ArrayBuffer): unknown;  // Hermes only
   set(name: string, value: unknown): void;
   get(name: string): unknown;
   dispose(): void;
 }
 ```
+
+### Hermes Bytecode Precompilation
+
+Hermes sandbox supports AOT (Ahead-of-Time) bytecode compilation for improved startup performance.
+
+**Compile JS to Hermes Bytecode:**
+
+```bash
+# Using hermesc (from React Native's Hermes)
+hermesc -emit-binary -O -out guest.hbc guest.js
+```
+
+**Execute Bytecode in Sandbox:**
+
+```typescript
+// Load precompiled bytecode
+const bytecode = await fetch('guest.hbc').then(r => r.arrayBuffer());
+
+// Create Hermes sandbox context
+const runtime = provider.createRuntime();
+const context = runtime.createContext();
+
+// Execute bytecode (skips parsing/compilation)
+if (context.evalBytecode) {
+  context.evalBytecode(bytecode);
+} else {
+  // Fallback to source code for non-Hermes providers
+  context.eval(sourceCode);
+}
+```
+
+**Benefits:**
+- Skip parsing and compilation phases
+- Faster startup for static guest code
+- Suitable for pre-known guest bundles and server-delivered updates
+
+**Limitations:**
+- Only available with Hermes sandbox (JSC/QuickJS not supported)
+- Bytecode must match Hermes engine version
+- Cannot use source maps for debugging
+
+| Scenario | Recommended Method |
+|----------|-------------------|
+| Static guest modules (build-time known) | `evalBytecode` + precompilation |
+| Dynamic guest code (runtime generated) | `eval` |
+| Server-delivered update packages | `evalBytecode` + deliver .hbc |
 
 ---
 
